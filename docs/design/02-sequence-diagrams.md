@@ -40,26 +40,25 @@ sequenceDiagram
     participant OrderController as 주문 컨트롤러
     participant OrderService as 주문 서비스
     participant PaymentService as 결제 서비스
-    participant PaymentMethod as 결제 수단
-    User ->> OrderController: POST /api/v1/orders
-    OrderController ->> OrderService: placeOrder(orderRequest)
-    Note over OrderService: Order 생성 및 저장 <br>(PENDING)
-    OrderService ->> PaymentService: 결제 요청 (requestPayment)
-    Note over PaymentService: Payment 생성 및 저장 <br>(PENDING)
-    PaymentService ->> PaymentMethod: execute()
-    PaymentMethod -->> PaymentService: PaymentResult (결제 결과)
-    Note over PaymentService: 결제 결과 저장
-    PaymentService ->> OrderService: 결제 결과 반환
 
+    User->>OrderController: POST /api/v1/orders
+    OrderController->>OrderService: placeOrder(orderRequest)
+
+    Note over OrderService: [Transaction 1] 시작 <br> Order 생성 및 저장 (상태: PENDING) <br> [Transaction 1] 종료
+
+    OrderService->>PaymentService: 결제 요청 (requestPayment)
+    PaymentService-->>OrderService: 결제 결과 반환
+
+    Note over OrderService: [Transaction 2] 시작
     alt 결제 성공 시
-        Note over OrderService: Order 상태 변경 <br>(COMPLETED) <br/> 재고 차감 등 후속 처리
+        Note over OrderService: Order 상태 변경 (COMPLETED) <br/> 재고 차감
     else 결제 실패 시
-        Note over OrderService: Order 상태 변경 <br>(FAILED)
+        Note over OrderService: Order 상태 변경 (FAILED)
     end
+    Note over OrderService: 변경된 Order 정보 저장 <br> [Transaction 2] 종료
 
-    Note over OrderService: 주문 결과 저장
-    OrderService -->> OrderController: OrderResult
-    OrderController -->> User: 201 Created
+    OrderService-->>OrderController: OrderResult
+    OrderController-->>User: 201 Created
 ```
 
 ## 3. 좋아요 등록
