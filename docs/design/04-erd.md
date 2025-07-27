@@ -81,22 +81,20 @@ erDiagram
     }
 
     likes {
-        bigint user_id PK, FK
-        bigint product_id PK, FK
+        bigint id PK
+        bigint user_id FK
+        bigint product_id FK
         timestamp created_at
         timestamp deleted_at
     }
 
-    users ||--o{ orders : "주문한다"
-    users ||--o{ likes : "누른다"
-    users ||--|| point_wallets : "소유한다"
-
-    brands ||--o{ products : "가진다"
-    products ||--|{ order_items : "포함된다"
-    products ||--o{ likes : "좋아요 받음"
-
-    orders ||--|{ order_items : "상세항목"
-    orders ||--|| payments : "결제된다"
-
-    point_wallets ||--o{ point_histories : "기록된다"
+    users ||--o{ orders: "주문한다"
+    users ||--o{ likes: "누른다"
+    users ||--|| point_wallets: "소유한다"
+    brands ||--o{ products: "가진다"
+    products ||--|{ order_items: "포함된다"
+    products ||--o{ likes: "좋아요 받음"
+    orders ||--|{ order_items: "상세항목"
+    orders ||--|| payments: "결제된다"
+    point_wallets ||--o{ point_histories: "기록된다"
 ```
