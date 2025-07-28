@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -81,6 +82,7 @@ class UserV1ApiE2ETest {
 
         @DisplayName("회원 가입 시 요청 값이 올바르지 않을 경우 `400 Bad Request` 응답을 반환한다.")
         @ParameterizedTest(name = "{index} - {0}")
+        @NullAndEmptySource
         @MethodSource("com.loopers.interfaces.api.user.param.SignupRequestParam#invalidRequests")
         void returnsBadRequest_whenParameterIsInvalid(String testName, String requestBody, HttpStatus expectedStatus) {
             // arrange

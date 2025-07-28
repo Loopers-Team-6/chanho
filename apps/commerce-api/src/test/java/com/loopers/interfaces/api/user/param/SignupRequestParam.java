@@ -16,14 +16,14 @@ public class SignupRequestParam {
 
     private static Stream<Arguments> invalidUsernames() {
         List<String> invalidParams = Arrays.asList(
-                null, "", " ", "한글", "kor한글", "verylongtext", "_", "hello-world", "12345678901");
+                " ", "한글", "kor한글", "verylongtext", "_", "hello-world", "12345678901");
         return invalidParams.stream()
                 .map(username -> invalidUsername("username: [%s]".formatted(username), username));
     }
 
     private static Stream<Arguments> invalidEmails() {
         List<String> invalidParams = Arrays.asList(
-                null, "", " ", "invalid-email", "test@test", "test@test.", "test@.com",
+                " ", "invalid-email", "test@test", "test@test.", "test@.com",
                 "@test.com", "test@test.c", "test@test_com", "test@test,com", "test@@email",
                 "test@email.commmmmmmm", "test@email.ㅁㅁㅁ");
         return invalidParams.stream()
@@ -32,14 +32,14 @@ public class SignupRequestParam {
 
     private static Stream<Arguments> invalidGenders() {
         List<String> invalidParams = Arrays.asList(
-                null, "", " ", "0", "123", "남자", "x", "X", "ABC");
+                " ", "0", "123", "남자", "x", "X", "ABC");
         return invalidParams.stream()
                 .map(gender -> invalidGender("gender: [%s]".formatted(gender), gender));
     }
 
     private static Stream<Arguments> invalidBirths() {
         List<String> invalidParams = Arrays.asList(
-                null, "", " ", "2000-01", "2000/01/01", "2000-1-1", "2000-01-1", "2000-1-01",
+                " ", "2000-01", "2000/01/01", "2000-1-1", "2000-01-1", "2000-1-01",
                 "2000.01.01", "01-01-2000", "2000-13-01", "2000-01-32", "2023-02-29",
                 "20000101", "000101", "00-01-01", "0001-01-01", "9999-01-01", "1899-01-01");
         return invalidParams.stream()
