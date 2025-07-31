@@ -123,7 +123,7 @@ class UserV1ApiE2ETest {
             ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
             };
             ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response =
-                    testRestTemplate.exchange(ENDPOINT, HttpMethod.POST, new HttpEntity<>(httpHeaders), responseType);
+                    testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
             // assert
             assertAll(
@@ -170,7 +170,7 @@ class UserV1ApiE2ETest {
             ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> responseType = new ParameterizedTypeReference<>() {
             };
             ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response =
-                    testRestTemplate.exchange(ENDPOINT, HttpMethod.POST, new HttpEntity<>(httpHeaders), responseType);
+                    testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
             // assert
             assertAll(

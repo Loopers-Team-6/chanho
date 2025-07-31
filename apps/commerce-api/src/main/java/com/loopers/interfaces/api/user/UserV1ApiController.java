@@ -23,7 +23,7 @@ public class UserV1ApiController implements UserV1ApiSpec {
         return ApiResponse.success(userFacade.signUp(request));
     }
 
-    @PostMapping("/me")
+    @GetMapping("/me")
     @Override
     public ApiResponse<UserV1Dto.UserResponse> me(HttpServletRequest request) {
         if (request.getHeader("X-USER-ID") == null) {
