@@ -4,6 +4,7 @@ import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @Table(name = "members")
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class UserEntity extends BaseEntity {
 
@@ -26,7 +27,7 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, name = "birth")
     private LocalDate birth;
 
-    public UserEntity(String username, String email, UserGender gender, String birth) {
+    private UserEntity(String username, String email, UserGender gender, LocalDate birth) {
         UserValidator.validateUsername(username);
         UserValidator.validateEmail(email);
         UserValidator.validateBirth(birth);
@@ -34,7 +35,15 @@ public class UserEntity extends BaseEntity {
         this.username = username;
         this.email = email;
         this.gender = gender;
-        this.birth = LocalDate.parse(birth);
+        this.birth = birth;
+    }
+
+    public static UserEntity create(String username, String email, UserGender gender, LocalDate birth) {
+        return new UserEntity(username, email, gender, birth);
+    }
+
+    public static UserEntity create(String username, String email, UserGender gender, String birth) {
+        return new UserEntity(username, email, gender, LocalDate.parse(birth));
     }
 
     static class UserValidator {
@@ -53,16 +62,16 @@ public class UserEntity extends BaseEntity {
             }
         }
 
-        static void validateBirth(String birth) {
+        static void validateBirth(LocalDate birth) {
             if (birth == null) {
                 throw new IllegalArgumentException("Invalid birth: birth cannot be null");
             }
+
             try {
-                LocalDate parsed = LocalDate.parse(birth);
-                if (parsed.isAfter(LocalDate.now())) {
+                if (birth.isAfter(LocalDate.now())) {
                     throw new IllegalArgumentException("birth cannot be in the future");
                 }
-                if (parsed.isBefore(LocalDate.of(1900, 1, 1))) {
+                if (birth.isBefore(LocalDate.of(1900, 1, 1))) {
                     throw new IllegalArgumentException("birth cannot be before 1900");
                 }
             } catch (DateTimeParseException e) {

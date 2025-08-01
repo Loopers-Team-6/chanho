@@ -16,11 +16,11 @@ public class UserCommand {
     ) {
 
         public UserEntity toEntity() {
-            return new UserEntity(
+            return UserEntity.create(
                     username,
                     email,
                     gender,
-                    birth.toString()
+                    birth
             );
         }
     }

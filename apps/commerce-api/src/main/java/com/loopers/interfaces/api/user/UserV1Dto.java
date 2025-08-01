@@ -6,6 +6,7 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 
 import java.time.LocalDate;
+import java.util.regex.Pattern;
 
 public class UserV1Dto {
     public record SignupRequest(
@@ -41,17 +42,17 @@ public class UserV1Dto {
     }
 
     static class Validator {
-        private static final String USERNAME_REGEX = "^[A-Za-z0-9]{1,10}$";
-        private static final String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+        private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]{1,10}$");
+        private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
 
         static void validateUsername(String username) {
-            if (username == null || username.isBlank() || !username.matches(USERNAME_REGEX)) {
+            if (username == null || username.isBlank() || !USERNAME_PATTERN.matcher(username).matches()) {
                 throw new CoreException(ErrorType.BAD_REQUEST, "이름은 1~10자의 영문 대소문자 또는 숫자만 포함할 수 있습니다.");
             }
         }
 
         static void validateEmail(String email) {
-            if (email == null || email.isBlank() || !email.matches(EMAIL_REGEX)) {
+            if (email == null || email.isBlank() || !EMAIL_PATTERN.matcher(email).matches()) {
                 throw new CoreException(ErrorType.BAD_REQUEST, "이메일 형식이 올바르지 않습니다.");
             }
         }

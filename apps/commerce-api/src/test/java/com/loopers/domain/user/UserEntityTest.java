@@ -25,7 +25,7 @@ public class UserEntityTest {
         @ValueSource(strings = {"한글", "kor한글", "verylongtext", "_", "hello-world"})
         void failedToCreateUserModel_whenUsernameIsInvalid(String invalidUsername) {
             assertThrows(IllegalArgumentException.class,
-                    () -> new UserEntity(
+                    () -> UserEntity.create(
                             invalidUsername,
                             "test@gmail.com",
                             UserGender.M,
@@ -38,7 +38,7 @@ public class UserEntityTest {
         @ValueSource(strings = {"invalid-invalidEmail", "test@test", "test@test.", "test@.com", "@test.com", "test@test.c", "test@test_com", "test@test,com"})
         void failedToCreateUserModel_whenEmailIsInvalid(String invalidEmail) {
             assertThrows(IllegalArgumentException.class,
-                    () -> new UserEntity(
+                    () -> UserEntity.create(
                             "mwma91",
                             invalidEmail,
                             UserGender.M,
@@ -51,7 +51,7 @@ public class UserEntityTest {
         @ValueSource(strings = {"2000/01/01", "2000-1-1", "2000-01-1", "2000-1-01", "2000.01.01", "01-01-2000", "2000-13-01", "2000-01-32", "2023-02-29", "20000101", "000101", "00-01-01", "0001-01-01", "9999-01-01"})
         void failedToCreateUserModel_whenBirthDateIsInvalid(String invalidBirthDate) {
             assertThrows(IllegalArgumentException.class,
-                    () -> new UserEntity(
+                    () -> UserEntity.create(
                             "mwma91",
                             "test@gmail.com",
                             UserGender.M,
