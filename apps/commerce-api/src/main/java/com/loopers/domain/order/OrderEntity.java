@@ -1,0 +1,47 @@
+package com.loopers.domain.order;
+
+import com.loopers.domain.user.UserEntity;
+import lombok.Getter;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+@Getter
+public class OrderEntity {
+
+    private UserEntity user;
+    private List<OrderItem> items = new ArrayList<>();
+    private BigDecimal totalPrice = BigDecimal.ZERO;
+
+    private OrderEntity(UserEntity user) {
+        this.user = user;
+    }
+
+    public static OrderEntity create(UserEntity user) {
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 정보는 유효해야 합니다.");
+        }
+
+        return new OrderEntity(user);
+    }
+
+    public void addOrderItem(Long productId, String productName, BigDecimal price, int quantity) {
+        if (productId == null || productName == null || productName.isBlank() || price == null) {
+            throw new IllegalArgumentException("주문 항목 정보가 유효하지 않습니다");
+        }
+
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("상품 가격은 0 이상이어야 합니다");
+        }
+
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("상품 수량은 1 이상이어야 합니다");
+        }
+
+        OrderItem newItem = OrderItem.create(this, productId, productName, price, quantity);
+        items.add(newItem);
+        totalPrice = totalPrice.add(newItem.getTotalPrice());
+    }
+
+}
