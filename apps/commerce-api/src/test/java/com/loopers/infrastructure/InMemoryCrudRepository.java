@@ -1,7 +1,7 @@
 package com.loopers.infrastructure;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.CrudRepository;
+import com.loopers.domain.CustomCrudRepository;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class InMemoryCrudRepository<T extends BaseEntity> implements CrudRepository<T> {
+public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudRepository<T> {
 
     protected final AtomicLong idGenerator = new AtomicLong(1L);
     protected final Map<Long, T> map = new ConcurrentHashMap<>();
@@ -50,7 +50,7 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CrudReposit
     }
 
     @Override
-    public List<T> findByIdIn(List<Long> ids) {
+    public List<T> findAllById(List<Long> ids) {
         return ids.stream()
                 .map(map::get)
                 .filter(Objects::nonNull)

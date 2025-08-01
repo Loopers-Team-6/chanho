@@ -1,9 +1,9 @@
 package com.loopers.domain.point;
 
-import com.loopers.domain.CrudRepository;
+import com.loopers.domain.CustomCrudRepository;
 
 import java.util.Optional;
 
-public interface PointRepository extends CrudRepository<PointEntity> {
+public interface PointRepository extends CustomCrudRepository<PointEntity> {
     Optional<PointEntity> findByUserId(Long id);
 }

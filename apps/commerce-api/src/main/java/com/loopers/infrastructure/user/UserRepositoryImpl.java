@@ -24,17 +24,21 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<UserEntity> findByIdIn(List<Long> ids) {
-        return List.of();
+    public List<UserEntity> findAllById(List<Long> ids) {
+        return userJpaRepository.findAllById(ids);
     }
 
     @Override
     public List<UserEntity> findAll() {
-        return List.of();
+        return userJpaRepository.findAll();
     }
 
     @Override
     public void deleteById(Long id) {
-
+        userJpaRepository.findById(id)
+                .ifPresent(user -> {
+                    user.delete();
+                    save(user);
+                });
     }
 }

@@ -1,7 +1,7 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.CrudRepository;
+import com.loopers.domain.CustomCrudRepository;
 
-public interface OrderRepository extends CrudRepository<OrderEntity> {
+public interface OrderRepository extends CustomCrudRepository<OrderEntity> {
 
 }

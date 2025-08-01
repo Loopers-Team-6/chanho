@@ -1,6 +1,6 @@
 package com.loopers.domain.product;
 
-import com.loopers.domain.CrudRepository;
+import com.loopers.domain.CustomCrudRepository;
 
-public interface ProductRepository extends CrudRepository<ProductEntity> {
+public interface ProductRepository extends CustomCrudRepository<ProductEntity> {
 }

@@ -20,22 +20,26 @@ public class PointRepositoryImpl implements PointRepository {
 
     @Override
     public Optional<PointEntity> findById(Long id) {
-        return Optional.empty();
+        return pointJpaRepository.findById(id);
     }
 
     @Override
-    public List<PointEntity> findByIdIn(List<Long> ids) {
-        return List.of();
+    public List<PointEntity> findAllById(List<Long> ids) {
+        return pointJpaRepository.findAllById(ids);
     }
 
     @Override
     public List<PointEntity> findAll() {
-        return List.of();
+        return pointJpaRepository.findAll();
     }
 
     @Override
     public void deleteById(Long id) {
-
+        pointJpaRepository.findById(id)
+                .ifPresent(point -> {
+                    point.delete();
+                    save(point);
+                });
     }
 
     @Override
