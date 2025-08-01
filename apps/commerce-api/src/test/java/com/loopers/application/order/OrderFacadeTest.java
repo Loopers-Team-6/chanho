@@ -1,7 +1,7 @@
-package com.loopers.domain.order;
+package com.loopers.application.order;
 
-import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.brand.BrandEntity;
+import com.loopers.domain.order.*;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.point.PointServiceImpl;
@@ -187,7 +187,7 @@ public class OrderFacadeTest {
             OrderInfo orderInfo = orderFacade.placeOrder(validUser.getId(), command);
 
             // assert
-            assertThat(orderInfo.getOrderStatus()).isEqualTo(OrderEntity.OrderStatus.COMPLETED.name());
+            assertThat(orderInfo.getOrderStatus()).isEqualTo("COMPLETED");
         }
 
         @DisplayName("주문이 완료되면 포인트가 차감된다")

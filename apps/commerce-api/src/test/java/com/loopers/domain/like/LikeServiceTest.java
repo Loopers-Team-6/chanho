@@ -63,7 +63,7 @@ public class LikeServiceTest {
             userRepository.save(user);
             productRepository.save(product);
 
-            int countBefore = likeRepository.countAll();
+            long countBefore = likeRepository.countAll();
 
             // act
             likeService.addLike(user.getId(), product.getId());

@@ -4,11 +4,13 @@ import com.loopers.domain.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "brands")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class BrandEntity extends BaseEntity {
 
     private String brandName;
