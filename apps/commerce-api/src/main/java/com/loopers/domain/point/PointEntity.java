@@ -32,4 +32,17 @@ public class PointEntity extends BaseEntity {
 
         this.amount += points;
     }
+
+    public void pay(int points) {
+        if (points <= 0) {
+            throw new IllegalArgumentException("차감 포인트는 0보다 커야 합니다.");
+        }
+
+        if (this.amount < points) {
+            throw new IllegalArgumentException(
+                    "포인트가 부족합니다. 현재 포인트: %s, 차감하려는 포인트: %s".formatted(this.amount, points));
+        }
+
+        this.amount -= points;
+    }
 }

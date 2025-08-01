@@ -1,8 +1,12 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.BaseEntity;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 
-public class OrderItem {
+@Getter
+public class OrderItem extends BaseEntity {
 
     private OrderEntity order;
     private Long productId;

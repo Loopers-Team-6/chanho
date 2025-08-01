@@ -1,6 +1,5 @@
 package com.loopers.domain.user;
 
-import com.loopers.application.user.UserCommand;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;

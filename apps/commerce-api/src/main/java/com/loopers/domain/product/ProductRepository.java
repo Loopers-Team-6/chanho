@@ -1,11 +1,6 @@
 package com.loopers.domain.product;
 
-import java.util.Optional;
+import com.loopers.domain.CrudRepository;
 
-public interface ProductRepository {
-
-    ProductEntity save(ProductEntity productEntity);
-
-    Optional<ProductEntity> findById(Long productId);
-
+public interface ProductRepository extends CrudRepository<ProductEntity> {
 }

@@ -1,11 +1,6 @@
 package com.loopers.domain.user;
 
-import java.util.Optional;
+import com.loopers.domain.CrudRepository;
 
-public interface UserRepository {
-
-    UserEntity save(UserEntity userEntity);
-
-    Optional<UserEntity> findById(Long id);
-
+public interface UserRepository extends CrudRepository<UserEntity> {
 }

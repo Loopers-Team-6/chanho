@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.UserEntity;
 import lombok.Getter;
 
@@ -8,11 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class OrderEntity {
+public class OrderEntity extends BaseEntity {
 
     private UserEntity user;
     private List<OrderItem> items = new ArrayList<>();
     private BigDecimal totalPrice = BigDecimal.ZERO;
+    private OrderStatus status = OrderStatus.PENDING;
 
     private OrderEntity(UserEntity user) {
         this.user = user;
@@ -44,4 +46,34 @@ public class OrderEntity {
         totalPrice = totalPrice.add(newItem.getTotalPrice());
     }
 
+    public List<Long> getProductIds() {
+        if (items.isEmpty()) {
+            return List.of();
+        }
+
+        return items.stream()
+                .map(OrderItem::getProductId)
+                .toList();
+    }
+
+    public void completeOrder() {
+        if (status != OrderStatus.PENDING) {
+            throw new IllegalStateException("오직 대기 중인 주문만 완료할 수 있습니다.");
+        }
+        status = OrderStatus.COMPLETED;
+    }
+
+    public void cancelOrder() {
+        if (status != OrderStatus.PENDING) {
+            throw new IllegalStateException("오직 대기 중인 주문만 취소할 수 있습니다.");
+        }
+        status = OrderStatus.CANCELLED;
+    }
+
+    enum OrderStatus {
+        PENDING,
+        COMPLETED,
+        CANCELLED,
+        FAILED;
+    }
 }
