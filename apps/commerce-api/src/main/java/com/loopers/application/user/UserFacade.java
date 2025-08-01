@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Component
 @RequiredArgsConstructor
 public class UserFacade {
@@ -55,8 +57,8 @@ public class UserFacade {
     }
 
     @Transactional
-    public PointV1Dto.PointResponse charge(Long userId, Long amount) {
-        if (amount <= 0) {
+    public PointV1Dto.PointResponse charge(Long userId, BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new CoreException(ErrorType.BAD_REQUEST, "Charge amount must be greater than zero.");
         }
 

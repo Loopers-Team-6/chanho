@@ -1,6 +1,7 @@
 package com.loopers.domain.order;
 
 import java.util.List;
+import java.util.Objects;
 
 public class OrderCommand {
 
@@ -9,7 +10,7 @@ public class OrderCommand {
             List<OrderItemDetail> items
     ) {
         public Place {
-            if (userId == null || items == null || items.isEmpty()) {
+            if (userId == null || items == null || items.isEmpty() || items.stream().anyMatch(Objects::isNull)) {
                 throw new IllegalArgumentException("사용자 ID와 주문 항목은 유효해야 합니다");
             }
         }

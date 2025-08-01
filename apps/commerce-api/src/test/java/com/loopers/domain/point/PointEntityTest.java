@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertThrows;
@@ -29,8 +30,8 @@ public class PointEntityTest {
                     UserGender.M,
                     LocalDate.of(2000, 1, 1)
             ));
-            assertThrows(IllegalArgumentException.class, () -> point.charge(0L));
-            assertThrows(IllegalArgumentException.class, () -> point.charge(-100L));
+            assertThrows(IllegalArgumentException.class, () -> point.charge(BigDecimal.ZERO));
+            assertThrows(IllegalArgumentException.class, () -> point.charge(BigDecimal.valueOf(-1L)));
         }
     }
 }

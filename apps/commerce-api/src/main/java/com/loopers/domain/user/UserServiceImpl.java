@@ -5,7 +5,6 @@ import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,7 +12,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    @Transactional
     @Override
     public UserEntity save(UserCommand.Create userCreateCommand) {
         if (userCreateCommand == null) {
@@ -27,7 +25,6 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    @Transactional(readOnly = true)
     @Override
     public UserEntity findById(Long id) {
         return userRepository.findById(id)

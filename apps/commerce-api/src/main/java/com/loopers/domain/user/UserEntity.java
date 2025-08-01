@@ -43,6 +43,7 @@ public class UserEntity extends BaseEntity {
     }
 
     public static UserEntity create(String username, String email, UserGender gender, String birth) {
+        UserValidator.validateBirthString(birth);
         return new UserEntity(username, email, gender, LocalDate.parse(birth));
     }
 
@@ -59,6 +60,17 @@ public class UserEntity extends BaseEntity {
         static void validateEmail(String email) {
             if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
                 throw new IllegalArgumentException("Invalid email");
+            }
+        }
+
+        static void validateBirthString(String birth) {
+            if (birth == null || birth.isBlank()) {
+                throw new IllegalArgumentException("Invalid birth: birth cannot be null or empty");
+            }
+            try {
+                LocalDate.parse(birth);
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("Invalid birth: must be in yyyy-MM-dd format", e);
             }
         }
 

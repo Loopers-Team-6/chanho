@@ -1,13 +1,17 @@
 package com.loopers.domain.order;
 
+import com.loopers.application.order.OrderFacade;
 import com.loopers.domain.brand.BrandEntity;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
+import com.loopers.domain.point.PointServiceImpl;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserGender;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.domain.user.UserServiceImpl;
 import com.loopers.infrastructure.order.FakeOrderRepository;
 import com.loopers.infrastructure.point.FakePointRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
@@ -25,14 +29,16 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class OrderServiceTest {
+public class OrderFacadeTest {
 
     /*
      * 주문 서비스 테스트
      *
      */
 
-    private OrderService orderService;
+    private static final BigDecimal DEFAULT_POINT_AMOUNT = BigDecimal.valueOf(1000000L);
+
+    private OrderFacade orderFacade;
     private UserEntity testUser;
     private PointEntity testPoint;
     private ProductEntity productA;
@@ -49,7 +55,12 @@ public class OrderServiceTest {
         productRepository = new FakeProductRepository();
         orderRepository = new FakeOrderRepository();
         pointRepository = new FakePointRepository();
-        orderService = new OrderService(orderRepository, productRepository, pointRepository);
+        orderFacade = new OrderFacade(
+                new UserServiceImpl(userRepository),
+                new OrderService(orderRepository),
+                new ProductService(productRepository),
+                new PointServiceImpl(pointRepository)
+        );
 
         testUser = UserEntity.create(
                 "testUser",
@@ -70,10 +81,8 @@ public class OrderServiceTest {
         @DisplayName("사용자가 유효하지 않으면 예외가 발생한다")
         @Test
         void createOrderWithInvalidUser() {
-            // arrange
-            UserEntity invalidUser = null; // 유효하지 않은 사용자
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(invalidUser, null));
+            assertThrows(IllegalArgumentException.class, () -> orderFacade.placeOrder(0L, null));
         }
 
         @DisplayName("주문 항목이 유효하지 않으면 예외가 발생한다")
@@ -82,7 +91,7 @@ public class OrderServiceTest {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(validUser, null));
+            assertThrows(IllegalArgumentException.class, () -> orderFacade.placeOrder(validUser.getId(), null));
         }
 
         @DisplayName("주문 항목이 유효하면 주문을 생성한다")
@@ -91,7 +100,7 @@ public class OrderServiceTest {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
             pointRepository.save(testPoint);
-            testPoint.charge(10000000L);
+            testPoint.charge(DEFAULT_POINT_AMOUNT);
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
             OrderCommand.Place command = new OrderCommand.Place(
@@ -103,7 +112,7 @@ public class OrderServiceTest {
             );
 
             // act
-            orderService.placeOrder(validUser, command);
+            orderFacade.placeOrder(validUser.getId(), command);
 
             // assert
             assertThat(orderRepository.findById(validUser.getId()))
@@ -118,13 +127,9 @@ public class OrderServiceTest {
         void createOrderWithEmptyItems() {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
-            OrderCommand.Place command = new OrderCommand.Place(
-                    validUser.getId(),
-                    Arrays.asList(null, null)
-            );
 
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(validUser, command));
+            assertThrows(IllegalArgumentException.class, () -> new OrderCommand.Place(validUser.getId(), Arrays.asList(null, null)));
         }
 
         @DisplayName("올바르게 주문이 생성되면, 재고가 차감된다")
@@ -133,7 +138,7 @@ public class OrderServiceTest {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
             pointRepository.save(testPoint);
-            testPoint.charge(10000000L);
+            testPoint.charge(DEFAULT_POINT_AMOUNT);
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
             int stockA = savedA.getStock();
@@ -151,7 +156,7 @@ public class OrderServiceTest {
             );
 
             // act
-            orderService.placeOrder(validUser, command);
+            orderFacade.placeOrder(validUser.getId(), command);
 
             // assert
             ProductEntity updatedProductA = productRepository.findById(savedA.getId()).orElseThrow();
@@ -167,7 +172,7 @@ public class OrderServiceTest {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
             pointRepository.save(testPoint);
-            testPoint.charge(10000000L);
+            testPoint.charge(DEFAULT_POINT_AMOUNT);
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
             OrderCommand.Place command = new OrderCommand.Place(
@@ -179,7 +184,7 @@ public class OrderServiceTest {
             );
 
             // act
-            OrderInfo orderInfo = orderService.placeOrder(validUser, command);
+            OrderInfo orderInfo = orderFacade.placeOrder(validUser.getId(), command);
 
             // assert
             assertThat(orderInfo.getOrderStatus()).isEqualTo(OrderEntity.OrderStatus.COMPLETED.name());
@@ -193,6 +198,7 @@ public class OrderServiceTest {
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
             pointRepository.save(testPoint);
+            testPoint.charge(DEFAULT_POINT_AMOUNT);
             OrderCommand.Place command = new OrderCommand.Place(
                     validUser.getId(),
                     List.of(
@@ -203,14 +209,14 @@ public class OrderServiceTest {
             BigDecimal totalPrice = savedA.getPrice().multiply(BigDecimal.valueOf(2))
                     .add(savedB.getPrice().multiply(BigDecimal.valueOf(1)));
 
-            testPoint.charge(totalPrice.longValue());
-            Long amountBeforeOrder = testPoint.getAmount();
+            BigDecimal amountBeforeOrder = testPoint.getAmount();
 
             // act
-            OrderInfo orderInfo = orderService.placeOrder(validUser, command);
+            OrderInfo orderInfo = orderFacade.placeOrder(validUser.getId(), command);
 
             // assert
-            assertThat(testPoint.getAmount()).isEqualTo(amountBeforeOrder - totalPrice.longValue());
+            assertThat(testPoint.getAmount()).isEqualTo(amountBeforeOrder.subtract(totalPrice));
+            assertThat(orderInfo.getTotalPrice()).isEqualTo(totalPrice);
         }
 
         @DisplayName("포인트가 모자라면 주문이 실패한다")
@@ -231,10 +237,10 @@ public class OrderServiceTest {
             BigDecimal totalPrice = savedA.getPrice().multiply(BigDecimal.valueOf(2))
                     .add(savedB.getPrice().multiply(BigDecimal.valueOf(1)));
 
-            testPoint.charge(totalPrice.longValue() - 1); // 포인트 부족
+            testPoint.charge(totalPrice.subtract(BigDecimal.ONE)); // 포인트 부족
 
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderService.placeOrder(validUser, command));
+            assertThrows(IllegalStateException.class, () -> orderFacade.placeOrder(validUser.getId(), command));
         }
     }
 
