@@ -79,16 +79,13 @@ public class UserEntity extends BaseEntity {
                 throw new IllegalArgumentException("Invalid birth: birth cannot be null");
             }
 
-            try {
-                if (birth.isAfter(LocalDate.now())) {
-                    throw new IllegalArgumentException("birth cannot be in the future");
-                }
-                if (birth.isBefore(LocalDate.of(1900, 1, 1))) {
-                    throw new IllegalArgumentException("birth cannot be before 1900");
-                }
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid birth: must be in yyyy-MM-dd format and a valid date", e);
+            if (birth.isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("birth cannot be in the future");
             }
+            if (birth.isBefore(LocalDate.of(1900, 1, 1))) {
+                throw new IllegalArgumentException("birth cannot be before 1900");
+            }
+
         }
     }
 }

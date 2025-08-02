@@ -23,9 +23,9 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudR
         }
         if (entity.getId() == null || entity.getId() == 0L) {
             Long newId = idGenerator.getAndIncrement();
-            T savedOrder = injectId(entity, newId);
-            map.put(newId, savedOrder);
-            return savedOrder;
+            T savedEntity = injectId(entity, newId);
+            map.put(newId, savedEntity);
+            return savedEntity;
         } else {
             T existingEntity = map.putIfAbsent(entity.getId(), entity);
             return existingEntity == null ? entity : existingEntity;
