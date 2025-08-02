@@ -2,9 +2,11 @@ package com.loopers.interfaces.api.point;
 
 import com.loopers.domain.point.PointEntity;
 
+import java.math.BigDecimal;
+
 public class PointV1Dto {
     public record PointResponse(
-            Long amount
+            BigDecimal amount
     ) {
         public static PointResponse from(PointEntity point) {
             return new PointResponse(
@@ -15,7 +17,7 @@ public class PointV1Dto {
 
     public record ChargeRequest(
             Long userId,
-            Long amount
+            BigDecimal amount
     ) {
     }
 }

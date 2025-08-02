@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,7 +66,7 @@ public class PointServiceIntegrationTest {
 
             // assert
             assertThat(point).isNotNull();
-            assertThat(point.getAmount()).isEqualTo(0);
+            assertThat(point.getAmount()).isEqualTo(BigDecimal.ZERO);
         }
 
         @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
@@ -90,7 +91,7 @@ public class PointServiceIntegrationTest {
         void fails_whenUserDoesNotExist() {
             // arrange
             Long nonExistentUserId = 999L;
-            Long chargeAmount = 100L;
+            BigDecimal chargeAmount = BigDecimal.valueOf(100);
 
             // act & assert
             assertThrows(CoreException.class, () -> {

@@ -5,12 +5,8 @@ import com.loopers.interfaces.api.ApiResponse;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -22,12 +18,12 @@ public class UserV1ApiController implements UserV1ApiSpec {
     @PostMapping
     @Override
     public ApiResponse<UserV1Dto.UserResponse> signUp(
-            @Valid
-            @RequestBody UserV1Dto.SignupRequest request) {
+            @RequestBody UserV1Dto.SignupRequest request
+    ) {
         return ApiResponse.success(userFacade.signUp(request));
     }
 
-    @PostMapping("/me")
+    @GetMapping("/me")
     @Override
     public ApiResponse<UserV1Dto.UserResponse> me(HttpServletRequest request) {
         if (request.getHeader("X-USER-ID") == null) {

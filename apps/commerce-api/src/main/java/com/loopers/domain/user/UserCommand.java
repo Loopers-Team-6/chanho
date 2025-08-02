@@ -1,7 +1,5 @@
-package com.loopers.application.user;
+package com.loopers.domain.user;
 
-import com.loopers.domain.user.UserEntity;
-import com.loopers.domain.user.UserGender;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -16,11 +14,11 @@ public class UserCommand {
     ) {
 
         public UserEntity toEntity() {
-            return new UserEntity(
+            return UserEntity.create(
                     username,
                     email,
                     gender,
-                    birth.toString()
+                    birth
             );
         }
     }
