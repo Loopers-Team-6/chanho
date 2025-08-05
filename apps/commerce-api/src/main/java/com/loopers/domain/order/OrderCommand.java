@@ -1,7 +1,6 @@
 package com.loopers.domain.order;
 
 import java.util.List;
-import java.util.Objects;
 
 public class OrderCommand {
 
@@ -10,9 +9,8 @@ public class OrderCommand {
             List<OrderItemDetail> items
     ) {
         public Place {
-            if (userId == null || items == null || items.isEmpty() || items.stream().anyMatch(Objects::isNull)) {
-                throw new IllegalArgumentException("사용자 ID와 주문 항목은 유효해야 합니다");
-            }
+            Validator.validateUserId(userId);
+            Validator.validateItems(items);
         }
     }
 
@@ -26,6 +24,26 @@ public class OrderCommand {
             }
             if (quantity <= 0) {
                 throw new IllegalArgumentException("상품 수량은 1 이상이어야 합니다");
+            }
+        }
+    }
+
+    static class Validator {
+        public static void validateUserId(Long userId) {
+            if (userId == null || userId <= 0) {
+                throw new IllegalArgumentException("사용자 ID는 유효해야 합니다.");
+            }
+        }
+
+        public static void validateItems(List<OrderItemDetail> items) {
+            if (items == null || items.isEmpty()) {
+                throw new IllegalArgumentException("주문 항목은 비어있을 수 없습니다");
+            }
+
+            for (OrderItemDetail item : items) {
+                if (item == null || item.productId() == null || item.quantity() <= 0) {
+                    throw new IllegalArgumentException("주문 항목 정보가 유효하지 않습니다");
+                }
             }
         }
     }

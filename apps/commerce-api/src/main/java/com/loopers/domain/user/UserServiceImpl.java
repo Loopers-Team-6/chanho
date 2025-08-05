@@ -28,6 +28,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity findById(Long id) {
         return userRepository.findById(id)
-                .orElse(null);
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "User not found with id: " + id));
     }
 }

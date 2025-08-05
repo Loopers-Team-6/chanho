@@ -16,6 +16,7 @@ import com.loopers.infrastructure.order.FakeOrderRepository;
 import com.loopers.infrastructure.point.FakePointRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
 import com.loopers.infrastructure.user.FakeUserRepository;
+import com.loopers.support.error.CoreException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -81,8 +82,19 @@ public class OrderFacadeTest {
         @DisplayName("사용자가 유효하지 않으면 예외가 발생한다")
         @Test
         void createOrderWithInvalidUser() {
+            // arrange
+            ProductEntity savedA = productRepository.save(productA);
+            ProductEntity savedB = productRepository.save(productB);
+            OrderCommand.Place command = new OrderCommand.Place(
+                    999L,
+                    List.of(
+                            new OrderCommand.OrderItemDetail(savedA.getId(), 2),
+                            new OrderCommand.OrderItemDetail(savedB.getId(), 1)
+                    )
+            );
+
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderFacade.placeOrder(0L, null));
+            assertThrows(CoreException.class, () -> orderFacade.placeOrder(command));
         }
 
         @DisplayName("주문 항목이 유효하지 않으면 예외가 발생한다")
@@ -91,7 +103,7 @@ public class OrderFacadeTest {
             // arrange
             UserEntity validUser = userRepository.save(testUser);
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> orderFacade.placeOrder(validUser.getId(), null));
+            assertThrows(IllegalArgumentException.class, () -> orderFacade.placeOrder(null));
         }
 
         @DisplayName("주문 항목이 유효하면 주문을 생성한다")
@@ -112,7 +124,7 @@ public class OrderFacadeTest {
             );
 
             // act
-            orderFacade.placeOrder(validUser.getId(), command);
+            orderFacade.placeOrder(command);
 
             // assert
             assertThat(orderRepository.findById(validUser.getId()))
@@ -156,7 +168,7 @@ public class OrderFacadeTest {
             );
 
             // act
-            orderFacade.placeOrder(validUser.getId(), command);
+            orderFacade.placeOrder(command);
 
             // assert
             ProductEntity updatedProductA = productRepository.findById(savedA.getId()).orElseThrow();
@@ -184,7 +196,7 @@ public class OrderFacadeTest {
             );
 
             // act
-            OrderInfo orderInfo = orderFacade.placeOrder(validUser.getId(), command);
+            OrderInfo orderInfo = orderFacade.placeOrder(command);
 
             // assert
             assertThat(orderInfo.getOrderStatus()).isEqualTo("COMPLETED");
@@ -212,7 +224,7 @@ public class OrderFacadeTest {
             BigDecimal amountBeforeOrder = testPoint.getAmount();
 
             // act
-            OrderInfo orderInfo = orderFacade.placeOrder(validUser.getId(), command);
+            OrderInfo orderInfo = orderFacade.placeOrder(command);
 
             // assert
             assertThat(testPoint.getAmount()).isEqualTo(amountBeforeOrder.subtract(totalPrice));
@@ -240,7 +252,7 @@ public class OrderFacadeTest {
             testPoint.charge(totalPrice.subtract(BigDecimal.ONE)); // 포인트 부족
 
             // act & assert
-            assertThrows(IllegalStateException.class, () -> orderFacade.placeOrder(validUser.getId(), command));
+            assertThrows(IllegalStateException.class, () -> orderFacade.placeOrder(command));
         }
     }
 

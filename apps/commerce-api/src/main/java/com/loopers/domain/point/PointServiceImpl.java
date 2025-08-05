@@ -26,13 +26,12 @@ public class PointServiceImpl implements PointService {
     @Override
     public PointEntity findByUserId(Long id) {
         return pointRepository.findByUserId(id)
-                .orElse(null);
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "사용자의 포인트 정보가 존재하지 않습니다: " + id));
     }
 
     @Override
     public void deductPoints(Long userId, BigDecimal points) {
-        PointEntity point = pointRepository.findByUserId(userId)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "사용자의 포인트 정보가 존재하지 않습니다: " + userId));
+        PointEntity point = findByUserId(userId);
 
         point.use(points);
     }

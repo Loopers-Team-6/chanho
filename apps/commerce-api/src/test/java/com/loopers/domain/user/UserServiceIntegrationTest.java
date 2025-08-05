@@ -119,11 +119,9 @@ class UserServiceIntegrationTest {
             // arrange
             Long nonExistentId = 999L;
 
-            // act
-            UserEntity foundUser = userService.findById(nonExistentId);
-
-            // assert
-            assertThat(foundUser).isNull();
+            // act & assert
+            CoreException exception = assertThrows(CoreException.class, () -> userService.findById(nonExistentId));
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }

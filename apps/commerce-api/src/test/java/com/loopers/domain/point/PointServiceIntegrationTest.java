@@ -2,9 +2,9 @@ package com.loopers.domain.point;
 
 import com.loopers.application.user.UserFacade;
 import com.loopers.domain.user.UserGender;
-import com.loopers.domain.user.UserService;
 import com.loopers.interfaces.api.user.UserV1Dto;
 import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,14 +33,10 @@ public class PointServiceIntegrationTest {
 
     @Autowired
     private UserFacade userFacade;
-
     @Autowired
     private PointService pointService;
-
     @Autowired
     private DatabaseCleanUp databaseCleanUp;
-    @Autowired
-    private UserService userService;
 
     @AfterEach
     void tearDown() {
@@ -69,17 +65,15 @@ public class PointServiceIntegrationTest {
             assertThat(point.getAmount()).isEqualTo(BigDecimal.ZERO);
         }
 
-        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우, null 이 반환된다.")
+        @DisplayName("해당 ID 의 회원이 존재하지 않을 경우 exception 이 발생한다.")
         @Test
         void returnsNull_whenUserDoesNotExist() {
             // arrange
             Long nonExistentUserId = 999L;
 
-            // act
-            PointEntity point = pointService.findByUserId(nonExistentUserId);
-
-            // assert
-            assertThat(point).isNull();
+            // act & assert
+            CoreException exception = assertThrows(CoreException.class, () -> pointService.findByUserId(nonExistentUserId));
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 
@@ -94,9 +88,10 @@ public class PointServiceIntegrationTest {
             BigDecimal chargeAmount = BigDecimal.valueOf(100);
 
             // act & assert
-            assertThrows(CoreException.class, () -> {
+            CoreException exception = assertThrows(CoreException.class, () -> {
                 userFacade.charge(nonExistentUserId, chargeAmount);
             });
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }
