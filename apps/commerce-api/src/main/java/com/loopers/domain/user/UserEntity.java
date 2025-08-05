@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 
 @Entity
@@ -42,11 +41,6 @@ public class UserEntity extends BaseEntity {
         return new UserEntity(username, email, gender, birth);
     }
 
-    public static UserEntity create(String username, String email, UserGender gender, String birth) {
-        UserValidator.validateBirthString(birth);
-        return new UserEntity(username, email, gender, LocalDate.parse(birth));
-    }
-
     static class UserValidator {
         private static final Pattern USERNAME_PATTERN = Pattern.compile("^[A-Za-z0-9]{1,10}$");
         private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$");
@@ -60,17 +54,6 @@ public class UserEntity extends BaseEntity {
         static void validateEmail(String email) {
             if (email == null || !EMAIL_PATTERN.matcher(email).matches()) {
                 throw new IllegalArgumentException("Invalid email");
-            }
-        }
-
-        static void validateBirthString(String birth) {
-            if (birth == null || birth.isBlank()) {
-                throw new IllegalArgumentException("Invalid birth: birth cannot be null or empty");
-            }
-            try {
-                LocalDate.parse(birth);
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("Invalid birth: must be in yyyy-MM-dd format", e);
             }
         }
 

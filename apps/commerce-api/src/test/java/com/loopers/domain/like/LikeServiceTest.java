@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,7 +52,7 @@ public class LikeServiceTest {
                     "user",
                     "test@test.com",
                     UserGender.M,
-                    "2000-01-01"
+                    LocalDate.of(2000, 1, 1)
             );
             ProductEntity product = ProductEntity.create(
                     "Test Product",
@@ -81,7 +82,7 @@ public class LikeServiceTest {
                     "user",
                     "test@test.com",
                     UserGender.M,
-                    "2000-01-01"
+                    LocalDate.of(2000, 1, 1)
             );
             ProductEntity product = ProductEntity.create(
                     "Test Product",
