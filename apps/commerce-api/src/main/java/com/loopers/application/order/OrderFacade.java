@@ -30,11 +30,11 @@ public class OrderFacade {
         UserEntity user = userService.findById(command.userId());
 
         // 1. 상품 조회 및 재고 차감
-        List<OrderItemInfo> orederItems = prepareAndDecreaseStocks(command.items());
-        
+        List<OrderItemInfo> orderItems = prepareAndDecreaseStocks(command.items());
+
         // 2. 주문 생성
         OrderEntity order = orderService.save(OrderEntity.create(user));
-        orederItems.forEach(order::addOrderItem);
+        orderItems.forEach(order::addOrderItem);
 
         // 3. 포인트 차감
         pointService.deductPoints(user.getId(), order.getTotalPrice());

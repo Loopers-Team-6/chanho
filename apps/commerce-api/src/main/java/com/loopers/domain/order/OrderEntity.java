@@ -65,7 +65,7 @@ public class OrderEntity extends BaseEntity {
 
     public void fail() {
         if (status != OrderStatus.PENDING) {
-            throw new IllegalStateException("오직 대기 중인 주문만 취소할 수 있습니다.");
+            throw new IllegalStateException("오직 대기 중인 주문만 실패처리할 수 있습니다.");
         }
         status = OrderStatus.FAILED;
     }
