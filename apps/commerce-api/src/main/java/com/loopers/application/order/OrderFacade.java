@@ -12,7 +12,7 @@ import com.loopers.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
+import java.util.List;
 
 @RequiredArgsConstructor
 public class OrderFacade {
@@ -29,18 +29,37 @@ public class OrderFacade {
         }
         UserEntity user = userService.findById(command.userId());
 
-        Map<ProductEntity, Integer> productQuantities = productService.getProductQuantities(command.items());
-        productQuantities.forEach(ProductEntity::decreaseStock);
-
+        // 1. 상품 조회 및 재고 차감
+        List<OrderItemInfo> orederItems = prepareAndDecreaseStocks(command.items());
+        
+        // 2. 주문 생성
         OrderEntity order = orderService.save(OrderEntity.create(user));
-        orderService.addOrderItems(order, productQuantities);
+        orederItems.forEach(order::addOrderItem);
 
+        // 3. 포인트 차감
         pointService.deductPoints(user.getId(), order.getTotalPrice());
 
+        // 4. 주문 완료
         order.complete();
         OrderEntity saved = orderService.save(order);
 
         return OrderInfo.from(saved);
+    }
+
+    private List<OrderItemInfo> prepareAndDecreaseStocks(List<OrderCommand.OrderItemDetail> items) {
+        return items.stream()
+                .map(item -> {
+                    ProductEntity product = productService.findById(item.productId());
+                    product.decreaseStock(item.quantity());
+
+                    return new OrderItemInfo(
+                            product.getId(),
+                            product.getName(),
+                            product.getPrice(),
+                            item.quantity()
+                    );
+                })
+                .toList();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.application.order.OrderItemInfo;
 import com.loopers.domain.brand.BrandEntity;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.user.UserEntity;
@@ -72,7 +73,6 @@ public class OrderEntityTest {
         @Test
         void throwExceptions_whenInvalidItemIsAdded() {
             // arrange
-            OrderEntity order = OrderEntity.create(testUser);
             Long invalidProductId = null; // 유효하지 않은 상품 ID
             String invalidProductName = ""; // 유효하지 않은 상품 이름
             BigDecimal invalidPrice = new BigDecimal("-1"); // 유효하지 않은 가격
@@ -85,13 +85,13 @@ public class OrderEntityTest {
 
             // act & assert
             assertThrows(IllegalArgumentException.class,
-                    () -> order.addOrderItem(invalidProductId, productName, price, quantity)); // 상품 ID 없음
+                    () -> new OrderItemInfo(invalidProductId, productName, price, quantity)); // 상품 ID 없음
             assertThrows(IllegalArgumentException.class,
-                    () -> order.addOrderItem(productId, invalidProductName, price, quantity)); // 상품 이름 없음
+                    () -> new OrderItemInfo(productId, invalidProductName, price, quantity)); // 상품 이름 없음
             assertThrows(IllegalArgumentException.class,
-                    () -> order.addOrderItem(productId, productName, invalidPrice, quantity)); // 가격이 0 이하
+                    () -> new OrderItemInfo(productId, productName, invalidPrice, quantity)); // 가격이 0 이하
             assertThrows(IllegalArgumentException.class,
-                    () -> order.addOrderItem(productId, productName, price, invalidQuantity)); // 수량이 0 이하
+                    () -> new OrderItemInfo(productId, productName, price, invalidQuantity)); // 수량이 0 이하
         }
 
         @DisplayName("유효한 주문 항목을 추가하면, 상품 총 가격이 계산된다")
@@ -114,8 +114,8 @@ public class OrderEntityTest {
                     .add(priceB.multiply(BigDecimal.valueOf(quantityB)));
 
             // act
-            order.addOrderItem(productIdA, productNameA, priceA, quantityA);
-            order.addOrderItem(productIdB, productNameB, priceB, quantityB);
+            order.addOrderItem(new OrderItemInfo(productIdA, productNameA, priceA, quantityA));
+            order.addOrderItem(new OrderItemInfo(productIdB, productNameB, priceB, quantityB));
 
             // assert
             assertThat(order.getItems()).hasSize(2);

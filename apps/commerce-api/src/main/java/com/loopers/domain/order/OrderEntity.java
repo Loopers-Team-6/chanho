@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.application.order.OrderItemInfo;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.UserEntity;
 import lombok.Getter;
@@ -28,20 +29,12 @@ public class OrderEntity extends BaseEntity {
         return new OrderEntity(user);
     }
 
-    public void addOrderItem(Long productId, String productName, BigDecimal price, int quantity) {
-        if (productId == null || productName == null || productName.isBlank() || price == null) {
-            throw new IllegalArgumentException("주문 항목 정보가 유효하지 않습니다");
+    public void addOrderItem(OrderItemInfo item) {
+        if (item == null) {
+            throw new IllegalArgumentException("주문 항목 정보는 null일 수 없습니다.");
         }
 
-        if (price.compareTo(BigDecimal.ZERO) < 0) {
-            throw new IllegalArgumentException("상품 가격은 0 이상이어야 합니다");
-        }
-
-        if (quantity <= 0) {
-            throw new IllegalArgumentException("상품 수량은 1 이상이어야 합니다");
-        }
-
-        OrderItem newItem = OrderItem.create(this, productId, productName, price, quantity);
+        OrderItem newItem = OrderItem.create(this, item.productId(), item.productName(), item.price(), item.quantity());
         items.add(newItem);
         totalPrice = totalPrice.add(newItem.getTotalPrice());
     }

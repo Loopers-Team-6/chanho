@@ -1,9 +1,6 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.product.ProductEntity;
 import lombok.RequiredArgsConstructor;
-
-import java.util.Map;
 
 @RequiredArgsConstructor
 public class OrderService {
@@ -14,8 +11,4 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
-    public void addOrderItems(OrderEntity order, Map<ProductEntity, Integer> productQuantities) {
-        productQuantities.forEach((product, quantity) ->
-                order.addOrderItem(product.getId(), product.getName(), product.getPrice(), quantity));
-    }
 }
