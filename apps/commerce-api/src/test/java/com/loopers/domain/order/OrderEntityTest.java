@@ -36,7 +36,7 @@ public class OrderEntityTest {
                 UserGender.M,
                 LocalDate.now().minusYears(20));
 
-        BrandEntity brand = new BrandEntity("나이키");
+        BrandEntity brand = BrandEntity.create("나이키");
         productA = ProductEntity.create("ProductA", 10000, 10, brand);
         productB = ProductEntity.create("ProductB", 25000, 5, brand);
     }

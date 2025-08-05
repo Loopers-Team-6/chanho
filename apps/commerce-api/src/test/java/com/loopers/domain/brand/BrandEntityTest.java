@@ -29,7 +29,7 @@ public class BrandEntityTest {
         void failsWhenCreateBrandEntityWithInvalidName(String invalidBrandName) {
             // arrange
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> new BrandEntity(invalidBrandName));
+            assertThrows(IllegalArgumentException.class, () -> BrandEntity.create(invalidBrandName));
         }
 
         @DisplayName("브랜드 이름이 유효하면, 브랜드 생성에 성공한다")
@@ -43,7 +43,7 @@ public class BrandEntityTest {
         void succeedsWhenCreateBrandEntityWithValidName(String validBrandName) {
             // arrange
             // act & assert
-            BrandEntity brand = new BrandEntity(validBrandName);// Should not throw an exception
+            BrandEntity brand = BrandEntity.create(validBrandName);// Should not throw an exception
             assertThat(brand.getId()).isNotNull();
         }
 

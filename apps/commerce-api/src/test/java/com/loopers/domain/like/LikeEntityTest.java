@@ -38,7 +38,7 @@ public class LikeEntityTest {
                     "Test Product",
                     100,
                     10,
-                    new BrandEntity("나이키")
+                    BrandEntity.create("나이키")
             );
             // act
             LikeEntity like = LikeEntity.create(user, product);
@@ -60,7 +60,7 @@ public class LikeEntityTest {
                     "Test Product",
                     100,
                     10,
-                    new BrandEntity("나이키")
+                    BrandEntity.create("나이키")
             );
 
             // act & assert

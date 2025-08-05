@@ -33,10 +33,10 @@ public class ProductEntityTest {
 
         public static Stream<Arguments> invalidProductDataProvider() {
             return Stream.of(
-                    Arguments.of(null, 100, 10, new BrandEntity("나이키")), // 상품 이름이 null
-                    Arguments.of("", 100, 10, new BrandEntity("나이키")), // 상품 이름이 빈 문자열
-                    Arguments.of("Test Product", -1, 10, new BrandEntity("나이키")), // 가격이 음수
-                    Arguments.of("Test Product", 100, -1, new BrandEntity("나이키")), // 재고가 음수
+                    Arguments.of(null, 100, 10, BrandEntity.create("나이키")), // 상품 이름이 null
+                    Arguments.of("", 100, 10, BrandEntity.create("나이키")), // 상품 이름이 빈 문자열
+                    Arguments.of("Test Product", -1, 10, BrandEntity.create("나이키")), // 가격이 음수
+                    Arguments.of("Test Product", 100, -1, BrandEntity.create("나이키")), // 재고가 음수
                     Arguments.of("Test Product", 100, 10, null) // 브랜드가 null
             );
         }
@@ -48,7 +48,7 @@ public class ProductEntityTest {
             String productName = "Test Product";
             int price = 100;
             int stock = 10;
-            BrandEntity brand = new BrandEntity("나이키");
+            BrandEntity brand = BrandEntity.create("나이키");
 
             // act
             ProductEntity product = ProductEntity.create(productName, price, stock, brand);
@@ -79,7 +79,7 @@ public class ProductEntityTest {
             String productName = "Test Product";
             int price = 100;
             int initialStock = 10;
-            BrandEntity brand = new BrandEntity("나이키");
+            BrandEntity brand = BrandEntity.create("나이키");
 
             // arrange
             ProductEntity product = ProductEntity.create(
@@ -103,7 +103,7 @@ public class ProductEntityTest {
             String productName = "Test Product";
             int price = 100;
             int initialStock = 5;
-            BrandEntity brand = new BrandEntity("나이키");
+            BrandEntity brand = BrandEntity.create("나이키");
 
             // arrange
             ProductEntity product = ProductEntity.create(

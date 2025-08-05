@@ -57,7 +57,7 @@ public class LikeServiceTest {
                     "Test Product",
                     100,
                     10,
-                    new BrandEntity("나이키")
+                    BrandEntity.create("나이키")
             );
 
             userRepository.save(user);
@@ -87,7 +87,7 @@ public class LikeServiceTest {
                     "Test Product",
                     100,
                     10,
-                    new BrandEntity("나이키")
+                    BrandEntity.create("나이키")
             );
             userRepository.save(user);
             productRepository.save(product);

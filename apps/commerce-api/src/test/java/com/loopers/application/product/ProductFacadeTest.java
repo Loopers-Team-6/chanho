@@ -54,7 +54,7 @@ public class ProductFacadeTest {
         user1 = userRepository.save(UserEntity.create("user1", "user1@test.com", UserGender.M, LocalDate.now().minusYears(20)));
         user2 = userRepository.save(UserEntity.create("user2", "user2@test.com", UserGender.F, LocalDate.now().minusYears(30)));
 
-        BrandEntity brand = new BrandEntity("나이키");
+        BrandEntity brand = BrandEntity.create("나이키");
         product1 = productRepository.save(ProductEntity.create("신발", 130000, 10, brand));
         product2 = productRepository.save(ProductEntity.create("가방", 170000, 5, brand));
     }

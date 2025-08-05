@@ -15,7 +15,11 @@ public class BrandEntity extends BaseEntity {
 
     private String brandName;
 
-    public BrandEntity(String brandName) {
+    public static BrandEntity create(String brandName) {
+        return new BrandEntity(brandName);
+    }
+
+    private BrandEntity(String brandName) {
         if (brandName == null || brandName.isBlank()) {
             throw new IllegalArgumentException("브랜드 이름은 반드시 존재해야 합니다.");
         }
