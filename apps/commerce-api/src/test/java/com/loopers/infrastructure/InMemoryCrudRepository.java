@@ -5,16 +5,16 @@ import com.loopers.domain.CustomCrudRepository;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudRepository<T> {
 
     protected final AtomicLong idGenerator = new AtomicLong(1L);
-    protected final Map<Long, T> map = new ConcurrentHashMap<>();
+    protected final ConcurrentMap<Long, T> map = new ConcurrentHashMap<>();
 
     @Override
     public T save(T entity) {
@@ -27,8 +27,8 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudR
             map.put(newId, savedEntity);
             return savedEntity;
         } else {
-            T existingEntity = map.putIfAbsent(entity.getId(), entity);
-            return existingEntity == null ? entity : existingEntity;
+            map.put(entity.getId(), entity);
+            return entity;
         }
     }
 
@@ -59,9 +59,7 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudR
 
     @Override
     public List<T> findAll() {
-        return map.values().stream()
-                .filter(Objects::nonNull)
-                .toList();
+        return map.values().stream().toList();
     }
 
     @Override

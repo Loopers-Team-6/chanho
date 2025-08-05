@@ -43,8 +43,9 @@ public class BrandEntityTest {
         void succeedsWhenCreateBrandEntityWithValidName(String validBrandName) {
             // arrange
             // act & assert
-            BrandEntity brand = BrandEntity.create(validBrandName);// Should not throw an exception
+            BrandEntity brand = BrandEntity.create(validBrandName);
             assertThat(brand.getId()).isNotNull();
+            assertThat(brand.getBrandName()).isEqualTo(validBrandName);
         }
 
     }
