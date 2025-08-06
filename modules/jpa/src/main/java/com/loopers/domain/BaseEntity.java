@@ -1,13 +1,8 @@
 package com.loopers.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
+import jakarta.persistence.*;
 import lombok.Getter;
+
 import java.time.ZonedDateTime;
 
 /**
@@ -35,7 +30,8 @@ public abstract class BaseEntity {
      * 엔티티의 유효성을 검증한다.
      * 이 메소드는 PrePersist 및 PreUpdate 시점에 호출된다.
      */
-    protected void guard() {}
+    protected void guard() {
+    }
 
     @PrePersist
     private void prePersist() {
@@ -69,5 +65,12 @@ public abstract class BaseEntity {
         if (this.deletedAt != null) {
             this.deletedAt = null;
         }
+    }
+
+    /**
+     * 엔티티가 삭제되었는지 여부를 확인한다.
+     */
+    public boolean isDeleted() {
+        return this.deletedAt != null;
     }
 }

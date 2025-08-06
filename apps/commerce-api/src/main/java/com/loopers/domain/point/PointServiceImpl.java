@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class PointServiceImpl implements PointService {
@@ -24,6 +26,13 @@ public class PointServiceImpl implements PointService {
     @Override
     public PointEntity findByUserId(Long id) {
         return pointRepository.findByUserId(id)
-                .orElse(null);
+                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "사용자의 포인트 정보가 존재하지 않습니다: " + id));
+    }
+
+    @Override
+    public void deductPoints(Long userId, BigDecimal points) {
+        PointEntity point = findByUserId(userId);
+
+        point.use(points);
     }
 }

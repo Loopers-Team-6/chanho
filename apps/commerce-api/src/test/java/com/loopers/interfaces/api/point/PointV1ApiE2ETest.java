@@ -15,6 +15,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.function.Function;
 
@@ -78,7 +79,7 @@ class PointV1ApiE2ETest {
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(response.getBody()).isNotNull(),
-                    () -> assertThat(response.getBody().data().amount()).isEqualTo(0)
+                    () -> assertThat(response.getBody().data().amount()).isEqualTo(BigDecimal.ZERO)
             );
         }
 
@@ -147,7 +148,7 @@ class PointV1ApiE2ETest {
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(response.getBody()).isNotNull(),
-                    () -> assertThat(response.getBody().data().amount()).isEqualTo(1000)
+                    () -> assertThat(response.getBody().data().amount()).isEqualTo(BigDecimal.valueOf(1000))
             );
         }
 

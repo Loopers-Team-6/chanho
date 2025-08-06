@@ -1,9 +1,13 @@
 package com.loopers.domain.point;
 
 import com.loopers.domain.user.UserEntity;
+import com.loopers.domain.user.UserGender;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.junit.Assert.assertThrows;
 
@@ -20,9 +24,14 @@ public class PointEntityTest {
         @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
         @Test
         void failedToChargePoint_whenAmountIsZeroOrNegative() {
-            PointEntity point = new PointEntity(new UserEntity());
-            assertThrows(IllegalArgumentException.class, () -> point.charge(0L));
-            assertThrows(IllegalArgumentException.class, () -> point.charge(-100L));
+            PointEntity point = new PointEntity(UserEntity.create(
+                    "testuser",
+                    "test@test.com",
+                    UserGender.M,
+                    LocalDate.of(2000, 1, 1)
+            ));
+            assertThrows(IllegalArgumentException.class, () -> point.charge(BigDecimal.ZERO));
+            assertThrows(IllegalArgumentException.class, () -> point.charge(BigDecimal.valueOf(-1L)));
         }
     }
 }

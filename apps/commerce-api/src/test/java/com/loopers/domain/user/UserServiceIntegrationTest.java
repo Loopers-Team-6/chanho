@@ -1,6 +1,5 @@
 package com.loopers.domain.user;
 
-import com.loopers.application.user.UserCommand;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
@@ -120,11 +119,9 @@ class UserServiceIntegrationTest {
             // arrange
             Long nonExistentId = 999L;
 
-            // act
-            UserEntity foundUser = userService.findById(nonExistentId);
-
-            // assert
-            assertThat(foundUser).isNull();
+            // act & assert
+            CoreException exception = assertThrows(CoreException.class, () -> userService.findById(nonExistentId));
+            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
         }
     }
 }
