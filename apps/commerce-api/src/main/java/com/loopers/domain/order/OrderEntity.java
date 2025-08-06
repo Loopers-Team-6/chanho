@@ -16,6 +16,8 @@ public class OrderEntity extends BaseEntity {
     private List<OrderItem> items = new ArrayList<>();
     private BigDecimal totalPrice = BigDecimal.ZERO;
     private OrderStatus status = OrderStatus.PENDING;
+    private Long appliedCouponId = null;
+    private BigDecimal discountAmount = BigDecimal.ZERO;
 
     private OrderEntity(UserEntity user) {
         this.user = user;
@@ -68,6 +70,15 @@ public class OrderEntity extends BaseEntity {
             throw new IllegalStateException("오직 대기 중인 주문만 실패처리할 수 있습니다.");
         }
         status = OrderStatus.FAILED;
+    }
+
+    public void applyDiscount(Long couponId, BigDecimal amount) {
+        this.appliedCouponId = couponId;
+        this.discountAmount = amount;
+    }
+
+    public BigDecimal getFinalPrice() {
+        return getTotalPrice().subtract(this.discountAmount);
     }
 
     enum OrderStatus {

@@ -1,6 +1,9 @@
 package com.loopers.application.order;
 
 import com.loopers.domain.brand.BrandEntity;
+import com.loopers.domain.coupon.CouponEntity;
+import com.loopers.domain.coupon.CouponRepository;
+import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.*;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
@@ -12,6 +15,7 @@ import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserGender;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.domain.user.UserServiceImpl;
+import com.loopers.infrastructure.coupon.FakeCouponRepository;
 import com.loopers.infrastructure.order.FakeOrderRepository;
 import com.loopers.infrastructure.point.FakePointRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
@@ -49,6 +53,7 @@ public class OrderFacadeTest {
     private ProductRepository productRepository;
     private OrderRepository orderRepository;
     private PointRepository pointRepository;
+    private CouponRepository couponRepository;
 
     @BeforeEach
     public void setUp() {
@@ -56,11 +61,13 @@ public class OrderFacadeTest {
         productRepository = new FakeProductRepository();
         orderRepository = new FakeOrderRepository();
         pointRepository = new FakePointRepository();
+        couponRepository = new FakeCouponRepository();
         orderFacade = new OrderFacade(
                 new UserServiceImpl(userRepository),
                 new OrderService(orderRepository),
                 new ProductService(productRepository),
-                new PointServiceImpl(pointRepository)
+                new PointServiceImpl(pointRepository),
+                new CouponService(couponRepository)
         );
 
         testUser = UserEntity.create(
@@ -85,7 +92,7 @@ public class OrderFacadeTest {
             // arrange
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     999L,
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), 2),
@@ -115,7 +122,7 @@ public class OrderFacadeTest {
             testPoint.charge(DEFAULT_POINT_AMOUNT);
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     validUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), 2),
@@ -141,7 +148,7 @@ public class OrderFacadeTest {
             UserEntity validUser = userRepository.save(testUser);
 
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> new OrderCommand.Place(validUser.getId(), Arrays.asList(null, null)));
+            assertThrows(IllegalArgumentException.class, () -> OrderCommand.Place.withoutCoupon(validUser.getId(), Arrays.asList(null, null)));
         }
 
         @DisplayName("올바르게 주문이 생성되면, 재고가 차감된다")
@@ -159,7 +166,7 @@ public class OrderFacadeTest {
             int quantityA = 2;
             int quantityB = 1;
 
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     validUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), quantityA),
@@ -187,7 +194,7 @@ public class OrderFacadeTest {
             testPoint.charge(DEFAULT_POINT_AMOUNT);
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     validUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), 2),
@@ -211,7 +218,7 @@ public class OrderFacadeTest {
             ProductEntity savedB = productRepository.save(productB);
             pointRepository.save(testPoint);
             testPoint.charge(DEFAULT_POINT_AMOUNT);
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     validUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), 2),
@@ -239,7 +246,7 @@ public class OrderFacadeTest {
             ProductEntity savedA = productRepository.save(productA);
             ProductEntity savedB = productRepository.save(productB);
             pointRepository.save(testPoint);
-            OrderCommand.Place command = new OrderCommand.Place(
+            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
                     validUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(savedA.getId(), 2),
@@ -253,6 +260,40 @@ public class OrderFacadeTest {
 
             // act & assert
             assertThrows(IllegalStateException.class, () -> orderFacade.placeOrder(command));
+        }
+
+        @DisplayName("쿠폰을 적용하면, 할인된 금액만큼 포인트가 차감되고 쿠폰은 사용 처리된다")
+        @Test
+        void placeOrder_withCoupon_shouldApplyDiscountAndMarkCouponAsUsed() {
+            // arrange
+            UserEntity user = userRepository.save(testUser);
+            pointRepository.save(testPoint);
+            testPoint.charge(DEFAULT_POINT_AMOUNT);
+
+            ProductEntity product = productRepository.save(productA);
+            int orderQuantity = 2;
+
+            CouponEntity coupon = couponRepository.save(CouponEntity.ofFixed("1000원 할인 쿠폰", user, 1000L));
+
+            BigDecimal originalPrice = product.getPrice().multiply(BigDecimal.valueOf(orderQuantity));
+            BigDecimal discountAmount = coupon.getDiscountAmount(originalPrice);
+            BigDecimal finalPrice = originalPrice.subtract(discountAmount);
+            BigDecimal initialPoints = testPoint.getAmount();
+
+            // act
+            OrderCommand.Place command = OrderCommand.Place.withCoupon(
+                    user.getId(),
+                    List.of(new OrderCommand.OrderItemDetail(product.getId(), orderQuantity)),
+                    coupon.getId()
+            );
+            orderFacade.placeOrder(command);
+
+            // assert
+            PointEntity userPointAfterOrder = pointRepository.findByUserId(user.getId()).orElseThrow();
+            CouponEntity usedCoupon = couponRepository.findById(coupon.getId()).orElseThrow();
+
+            assertThat(userPointAfterOrder.getAmount()).isEqualTo(initialPoints.subtract(finalPrice));
+            assertThat(usedCoupon.isUsed()).isTrue();
         }
     }
 

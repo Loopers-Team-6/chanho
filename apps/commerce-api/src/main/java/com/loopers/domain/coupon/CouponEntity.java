@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon;
 
+import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.UserEntity;
 import lombok.Getter;
 
@@ -7,7 +8,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 @Getter
-public class CouponEntity {
+public class CouponEntity extends BaseEntity {
     private String name;
     private UserEntity owner;
     private DiscountPolicy discountPolicy;
@@ -39,6 +40,15 @@ public class CouponEntity {
             throw new IllegalStateException("이미 사용된 쿠폰입니다.");
         }
         isUsed = true;
+    }
+
+    public void validateAvailability(Long userId) {
+        if (isUsed) {
+            throw new IllegalStateException("이미 사용된 쿠폰입니다.");
+        }
+        if (!owner.getId().equals(userId)) {
+            throw new IllegalArgumentException("쿠폰 소유자와 요청한 사용자의 ID가 일치하지 않습니다.");
+        }
     }
 
     static class Validator {
