@@ -2,17 +2,34 @@ package com.loopers.domain.coupon;
 
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.user.UserEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 
+@Entity
+@Table(name = "coupons")
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Getter
 public class CouponEntity extends BaseEntity {
+
+    @Column(name = "name", nullable = false, length = 50)
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity owner;
-    private DiscountPolicy discountPolicy;
+
+    @Column(name = "is_used", nullable = false)
     private boolean isUsed = false;
+
+    @Embedded
+    private DiscountPolicy discountPolicy;
 
     private CouponEntity(String name, UserEntity owner, DiscountPolicy discountPolicy) {
         Validator.validateName(name);
@@ -71,14 +88,15 @@ public class CouponEntity extends BaseEntity {
         }
     }
 
+    @Embeddable
+    @NoArgsConstructor(access = AccessLevel.PROTECTED)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
     static class DiscountPolicy {
-        private final CouponType type;
-        private final long value;
-
-        private DiscountPolicy(CouponType type, long value) {
-            this.type = type;
-            this.value = value;
-        }
+        @Enumerated(EnumType.STRING)
+        @Column(name = "coupon_type", nullable = false)
+        private CouponType type;
+        @Column(name = "discount_value", nullable = false)
+        private long value;
 
         private static DiscountPolicy ofFixed(long amount) {
             if (amount <= 0) {
@@ -108,6 +126,19 @@ public class CouponEntity extends BaseEntity {
             }
 
             return BigDecimal.ZERO;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            DiscountPolicy that = (DiscountPolicy) obj;
+            return value == that.value && type == that.type;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, value);
         }
     }
 }

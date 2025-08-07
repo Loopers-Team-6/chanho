@@ -13,4 +13,11 @@ public class FakePointRepository extends InMemoryCrudRepository<PointEntity> imp
                 .filter(point -> point.getUser().getId().equals(id))
                 .findFirst();
     }
+
+    @Override
+    public Optional<PointEntity> findByUserIdWithPessimisticLock(long userId) {
+        return map.values().stream()
+                .filter(point -> point.getUser().getId().equals(userId))
+                .findFirst();
+    }
 }

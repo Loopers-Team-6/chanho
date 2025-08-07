@@ -1,9 +1,9 @@
 package com.loopers.domain.coupon;
 
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @RequiredArgsConstructor
 public class CouponService {
 
@@ -15,6 +15,6 @@ public class CouponService {
 
     public CouponEntity findById(Long id) {
         return couponRepository.findById(id)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "Coupon not found with id: " + id));
+                .orElseThrow(() -> new IllegalArgumentException("Coupon not found with id: " + id));
     }
 }

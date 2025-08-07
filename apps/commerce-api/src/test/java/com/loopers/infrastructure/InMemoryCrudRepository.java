@@ -17,6 +17,11 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudR
     protected final ConcurrentMap<Long, T> map = new ConcurrentHashMap<>();
 
     @Override
+    public long count() {
+        return map.size();
+    }
+
+    @Override
     public T save(T entity) {
         if (entity == null) {
             throw new IllegalArgumentException("Entity cannot be null");

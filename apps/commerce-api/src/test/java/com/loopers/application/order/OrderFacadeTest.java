@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class OrderFacadeTest {
 
     /*
-     * 주문 서비스 테스트
+     * 주문 파사드 테스트
      *
      */
 

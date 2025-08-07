@@ -4,11 +4,10 @@ import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class LikeService {
@@ -21,13 +20,11 @@ public class LikeService {
         return likeRepository.findByUserIdAndProductId(userId, productId)
                 .orElseGet(() -> {
                     UserEntity user = userRepository.findById(userId)
-                            .orElseThrow(() -> new CoreException(
-                                    ErrorType.BAD_REQUEST,
+                            .orElseThrow(() -> new IllegalArgumentException(
                                     "사용자를 찾을 수 없습니다. userId: " + userId
                             ));
                     ProductEntity product = productRepository.findById(productId)
-                            .orElseThrow(() -> new CoreException(
-                                    ErrorType.BAD_REQUEST,
+                            .orElseThrow(() -> new IllegalArgumentException(
                                     "상품을 찾을 수 없습니다. productId: " + productId
                             ));
                     LikeEntity newLike = LikeEntity.create(user, product);
@@ -64,7 +61,9 @@ public class LikeService {
         if (productIds == null || productIds.isEmpty()) {
             return Collections.emptyMap();
         }
-        return likeRepository.countByProductIds(productIds);
+        return likeRepository.findLikeCountsByProductIds(productIds)
+                .stream()
+                .collect(Collectors.toMap(LikeCountDto::productId, LikeCountDto::count));
     }
 
 }

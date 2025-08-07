@@ -3,11 +3,21 @@ package com.loopers.domain.like;
 import com.loopers.domain.BaseEntity;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.user.UserEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@Entity
+@Table(name = "likes")
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Getter
 public class LikeEntity extends BaseEntity {
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
 
     private LikeEntity(UserEntity user, ProductEntity product) {

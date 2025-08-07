@@ -12,11 +12,16 @@ import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class OrderFacade {
 
@@ -26,6 +31,11 @@ public class OrderFacade {
     private final PointService pointService;
     private final CouponService couponService;
 
+    @Retryable(
+            retryFor = {ObjectOptimisticLockingFailureException.class},
+            maxAttempts = 3,
+            backoff = @Backoff(delay = 200)
+    )
     @Transactional
     public OrderInfo placeOrder(OrderCommand.Place command) {
         if (command == null) {
@@ -75,10 +85,10 @@ public class OrderFacade {
             return;
         }
 
-        BigDecimal originalPrice = order.getTotalPrice();
         CouponEntity coupon = couponService.findById(couponId);
         coupon.validateAvailability(user.getId());
 
+        BigDecimal originalPrice = order.getTotalPrice();
         BigDecimal discountAmount = coupon.getDiscountAmount(originalPrice);
 
         coupon.use();

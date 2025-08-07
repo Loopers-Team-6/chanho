@@ -46,6 +46,7 @@ subprojects {
     }
 
     dependencies {
+        implementation("org.springframework.retry:spring-retry:2.0.12")
         // Web
         runtimeOnly("org.springframework.boot:spring-boot-starter-validation")
         // Spring

@@ -16,13 +16,15 @@ public class ProductEntity extends BaseEntity {
 
     @Column(nullable = false, name = "name", length = 50)
     private String name;
-    @Column(nullable = false, name = "price", precision = 10, scale = 0)
+    @Column(nullable = false, name = "price", precision = 10)
     private BigDecimal price;
     @Column(nullable = false, name = "stock")
     private int stock;
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = false)
     private BrandEntity brand;
+    @Version
+    long version;
 
     private ProductEntity(String productName, int price, int initialStock, BrandEntity brand) {
         if (productName == null || productName.isBlank() || price <= 0 || initialStock < 0 || brand == null) {

@@ -1,6 +1,7 @@
 package com.loopers.domain.brand;
 
 import com.loopers.domain.BaseEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Getter
 public class BrandEntity extends BaseEntity {
 
+    @Column(name = "brand_name", nullable = false, length = 50)
     private String brandName;
 
     public static BrandEntity create(String brandName) {
