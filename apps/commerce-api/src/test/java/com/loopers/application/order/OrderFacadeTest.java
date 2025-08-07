@@ -20,7 +20,7 @@ import com.loopers.infrastructure.order.FakeOrderRepository;
 import com.loopers.infrastructure.point.FakePointRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
 import com.loopers.infrastructure.user.FakeUserRepository;
-import com.loopers.support.error.CoreException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -101,7 +101,7 @@ public class OrderFacadeTest {
             );
 
             // act & assert
-            assertThrows(CoreException.class, () -> orderFacade.placeOrder(command));
+            assertThrows(EntityNotFoundException.class, () -> orderFacade.placeOrder(command));
         }
 
         @DisplayName("주문 항목이 유효하지 않으면 예외가 발생한다")

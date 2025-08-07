@@ -1,8 +1,7 @@
 package com.loopers.domain.user;
 
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -84,8 +83,7 @@ class UserServiceIntegrationTest {
             UserEntity saved = userService.save(newUser);
 
             // assert
-            CoreException exception = assertThrows(CoreException.class, () -> userService.save(newUser));
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.CONFLICT);
+            assertThrows(IllegalArgumentException.class, () -> userService.save(newUser));
         }
     }
 
@@ -120,8 +118,7 @@ class UserServiceIntegrationTest {
             Long nonExistentId = 999L;
 
             // act & assert
-            CoreException exception = assertThrows(CoreException.class, () -> userService.findById(nonExistentId));
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThrows(EntityNotFoundException.class, () -> userService.findById(nonExistentId));
         }
     }
 }

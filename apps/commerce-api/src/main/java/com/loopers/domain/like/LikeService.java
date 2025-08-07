@@ -17,19 +17,14 @@ public class LikeService {
     private final ProductRepository productRepository;
 
     public LikeEntity addLike(long userId, long productId) {
-        return likeRepository.findByUserIdAndProductId(userId, productId)
-                .orElseGet(() -> {
-                    UserEntity user = userRepository.findById(userId)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "사용자를 찾을 수 없습니다. userId: " + userId
-                            ));
-                    ProductEntity product = productRepository.findById(productId)
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                    "상품을 찾을 수 없습니다. productId: " + productId
-                            ));
-                    LikeEntity newLike = LikeEntity.create(user, product);
-                    return likeRepository.save(newLike);
-                });
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. userId: " + userId));
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. productId: " + productId));
+
+        LikeEntity newLike = LikeEntity.create(user, product);
+
+        return likeRepository.saveOrFind(newLike);
     }
 
     public void removeLike(long userId, long productId) {

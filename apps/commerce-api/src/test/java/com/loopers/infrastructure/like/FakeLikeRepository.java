@@ -50,4 +50,10 @@ public class FakeLikeRepository extends InMemoryCrudRepository<LikeEntity> imple
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public LikeEntity saveOrFind(LikeEntity likeEntity) {
+        LikeEntity like = map.putIfAbsent(likeEntity.getId(), likeEntity);
+        return like != null ? like : likeEntity;
+    }
+
 }

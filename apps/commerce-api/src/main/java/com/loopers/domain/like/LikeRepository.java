@@ -17,4 +17,6 @@ public interface LikeRepository extends CustomCrudRepository<LikeEntity> {
     void deleteByUserIdAndProductId(Long userId, Long productId);
 
     Set<Long> findLikedProductIdsByUserIdAndProductIds(Long userId, List<Long> productIds);
+
+    LikeEntity saveOrFind(LikeEntity likeEntity);
 }

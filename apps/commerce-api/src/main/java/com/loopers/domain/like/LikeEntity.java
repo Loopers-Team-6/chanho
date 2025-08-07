@@ -7,6 +7,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "likes")
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
@@ -34,5 +36,19 @@ public class LikeEntity extends BaseEntity {
 
     public static LikeEntity create(UserEntity user, ProductEntity product) {
         return new LikeEntity(user, product);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LikeEntity that)) return false;
+
+        if (!user.getId().equals(that.user.getId())) return false;
+        return product.getId().equals(that.product.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user.getId(), product.getId());
     }
 }
