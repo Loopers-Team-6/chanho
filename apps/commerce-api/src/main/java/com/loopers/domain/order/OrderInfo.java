@@ -19,7 +19,7 @@ public class OrderInfo {
                 orderEntity.getId(),
                 orderEntity.getUser().getId(),
                 orderEntity.getStatus().name(),
-                orderEntity.getTotalPrice()
+                orderEntity.getOriginalPrice()
         );
     }
 }

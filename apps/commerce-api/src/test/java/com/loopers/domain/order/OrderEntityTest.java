@@ -119,7 +119,7 @@ public class OrderEntityTest {
 
             // assert
             assertThat(order.getItems()).hasSize(2);
-            assertThat(order.getTotalPrice()).isEqualTo(totalPrice);
+            assertThat(order.getOriginalPrice()).isEqualTo(totalPrice);
         }
     }
 }

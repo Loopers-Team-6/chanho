@@ -51,7 +51,7 @@ public class OrderFacade {
         orderItems.forEach(order::addOrderItem);
 
         // 3. 쿠폰 적용 로직
-        applyCoupon(order, user, command.couponId());
+        applyCoupon(order, command.couponId());
 
         // 4. 최종 가격으로 포인트 차감
         BigDecimal finalPrice = order.getFinalPrice();
@@ -80,15 +80,15 @@ public class OrderFacade {
                 .toList();
     }
 
-    private void applyCoupon(OrderEntity order, UserEntity user, Long couponId) {
+    private void applyCoupon(OrderEntity order, Long couponId) {
         if (couponId == null) {
             return;
         }
 
         CouponEntity coupon = couponService.findById(couponId);
-        coupon.validateAvailability(user.getId());
+        coupon.validateAvailability(order.getUser().getId());
 
-        BigDecimal originalPrice = order.getTotalPrice();
+        BigDecimal originalPrice = order.getOriginalPrice();
         BigDecimal discountAmount = coupon.getDiscountAmount(originalPrice);
 
         coupon.use();

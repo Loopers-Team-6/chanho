@@ -23,15 +23,15 @@ public class OrderEntity extends BaseEntity {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("id ASC")
     private List<OrderItem> items = new ArrayList<>();
-    @Column(name = "total_price", precision = 10, nullable = false)
-    private BigDecimal totalPrice = BigDecimal.ZERO;
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
+    @Column(name = "original_price", precision = 10, nullable = false)
+    private BigDecimal originalPrice = BigDecimal.ZERO;
+    @Column(name = "final_price", precision = 10, nullable = false)
+    private BigDecimal finalPrice = BigDecimal.ZERO;
     @Column(name = "applied_coupon_id")
     private Long appliedCouponId = null;
-    @Column(name = "discount_amount", precision = 10, nullable = false)
-    private BigDecimal discountAmount = BigDecimal.ZERO;
 
     private OrderEntity(UserEntity user) {
         this.user = user;
@@ -52,7 +52,7 @@ public class OrderEntity extends BaseEntity {
 
         OrderItem newItem = OrderItem.create(this, item.productId(), item.productName(), item.price(), item.quantity());
         items.add(newItem);
-        totalPrice = totalPrice.add(newItem.getTotalPrice());
+        originalPrice = originalPrice.add(newItem.getTotalPrice());
     }
 
     public List<Long> getProductIds() {
@@ -86,13 +86,19 @@ public class OrderEntity extends BaseEntity {
         status = OrderStatus.FAILED;
     }
 
-    public void applyDiscount(Long couponId, BigDecimal amount) {
+    public void applyDiscount(Long couponId, BigDecimal discountAmount) {
         this.appliedCouponId = couponId;
-        this.discountAmount = amount;
-    }
 
-    public BigDecimal getFinalPrice() {
-        return getTotalPrice().subtract(this.discountAmount);
+        if (discountAmount.compareTo(originalPrice) > 0) {
+            this.finalPrice = BigDecimal.ZERO;
+            return;
+        }
+
+        if (discountAmount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("할인 금액은 0보다 커야 합니다.");
+        }
+
+        this.finalPrice = originalPrice.subtract(discountAmount);
     }
 
     enum OrderStatus {
