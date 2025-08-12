@@ -21,8 +21,14 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false, name = "stock")
     private int stock;
     @ManyToOne
-    @JoinColumn(name = "brand_id", nullable = false)
+    @JoinColumn(
+            name = "brand_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private BrandEntity brand;
+    @Column(nullable = false, name = "like_count")
+    private long likeCount;
     @Version
     long version;
 
