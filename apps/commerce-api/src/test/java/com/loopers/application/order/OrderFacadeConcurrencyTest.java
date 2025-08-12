@@ -136,7 +136,7 @@ public class OrderFacadeConcurrencyTest {
 
             // 나머지 주문은 모두 실패했는지 확인
             assertThat(failCount.get()).isEqualTo(threadCount - 1);
-            
+
             // 최종 재고가 0인지 확인
             assertThat(finalProduct.getStock()).isZero();
         }
@@ -245,11 +245,11 @@ public class OrderFacadeConcurrencyTest {
             pointRepository.save(point);
 
             BrandEntity brand = brandRepository.save(BrandEntity.create("madeInChina"));
-            List<ProductEntity> produtcs = new ArrayList<>();
+            List<ProductEntity> products = new ArrayList<>();
             List<OrderCommand.Place> commands = new ArrayList<>();
             for (int i = 0; i < threadCount; i++) {
-                produtcs.add(productRepository.save(ProductEntity.create("상품" + (i + 1), 1000, 100, brand)));
-                commands.add(OrderCommand.Place.withoutCoupon(user.getId(), List.of(new OrderCommand.OrderItemDetail(produtcs.get(i).getId(), 1))));
+                products.add(productRepository.save(ProductEntity.create("상품" + (i + 1), 1000, 100, brand)));
+                commands.add(OrderCommand.Place.withoutCoupon(user.getId(), List.of(new OrderCommand.OrderItemDetail(products.get(i).getId(), 1))));
             }
 
             ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -279,7 +279,7 @@ public class OrderFacadeConcurrencyTest {
             // 포인트가 정확하게 차감되었는지 확인
             PointEntity finalPoint = pointRepository.findById(point.getId()).orElseThrow();
             BigDecimal expectedPoints = initialPoints
-                    .subtract(produtcs.stream().map(ProductEntity::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
+                    .subtract(products.stream().map(ProductEntity::getPrice).reduce(BigDecimal.ZERO, BigDecimal::add));
             assertThat(finalPoint.getAmount()).isEqualByComparingTo(expectedPoints);
 
             // 성공 횟수만큼 주문이 생성되었는지 확인

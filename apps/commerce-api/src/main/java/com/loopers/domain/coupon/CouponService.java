@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,6 @@ public class CouponService {
 
     public CouponEntity findById(Long id) {
         return couponRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Coupon not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Coupon not found with id: " + id));
     }
 }

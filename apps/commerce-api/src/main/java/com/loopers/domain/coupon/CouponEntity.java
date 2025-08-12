@@ -32,7 +32,7 @@ public class CouponEntity extends BaseEntity {
     private DiscountPolicy discountPolicy;
 
     @Version
-    long version;
+    private long version;
 
     private CouponEntity(String name, UserEntity owner, DiscountPolicy discountPolicy) {
         Validator.validateName(name);
