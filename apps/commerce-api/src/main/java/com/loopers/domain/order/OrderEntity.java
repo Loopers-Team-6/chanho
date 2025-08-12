@@ -53,6 +53,7 @@ public class OrderEntity extends BaseEntity {
         OrderItem newItem = OrderItem.create(this, item.productId(), item.productName(), item.price(), item.quantity());
         items.add(newItem);
         originalPrice = originalPrice.add(newItem.getTotalPrice());
+        finalPrice = originalPrice;
     }
 
     public List<Long> getProductIds() {
