@@ -1,22 +1,16 @@
 package com.loopers.infrastructure.like;
 
+import com.loopers.domain.like.LikeCountDto;
 import com.loopers.domain.like.LikeEntity;
 import com.loopers.domain.like.LikeRepository;
 import com.loopers.infrastructure.InMemoryCrudRepository;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class FakeLikeRepository extends InMemoryCrudRepository<LikeEntity> implements LikeRepository {
-
-    @Override
-    public long countAll() {
-        return map.size();
-    }
 
     @Override
     public long countByProductId(Long productId) {
@@ -26,14 +20,10 @@ public class FakeLikeRepository extends InMemoryCrudRepository<LikeEntity> imple
     }
 
     @Override
-    public Map<Long, Long> countByProductIds(List<Long> productIds) {
+    public List<LikeCountDto> findLikeCountsByProductIds(List<Long> productIds) {
         return productIds.stream()
-                .collect(Collectors.toMap(
-                        productId -> productId,
-                        this::countByProductId,
-                        (existing, replacement) -> existing,
-                        ConcurrentHashMap::new
-                ));
+                .map(productId -> new LikeCountDto(productId, countByProductId(productId)))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -58,6 +48,12 @@ public class FakeLikeRepository extends InMemoryCrudRepository<LikeEntity> imple
                         && !likeEntity.isDeleted())
                 .map(likeEntity -> likeEntity.getProduct().getId())
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public LikeEntity saveOrFind(LikeEntity likeEntity) {
+        LikeEntity like = map.putIfAbsent(likeEntity.getId(), likeEntity);
+        return like != null ? like : likeEntity;
     }
 
 }

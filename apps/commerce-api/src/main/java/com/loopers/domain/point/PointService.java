@@ -9,4 +9,6 @@ public interface PointService {
     PointEntity findByUserId(Long id);
 
     void deductPoints(Long id, BigDecimal totalPrice);
+
+    PointEntity findByUserIdWithPessimisticLock(long userId);
 }

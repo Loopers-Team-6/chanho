@@ -64,14 +64,14 @@ public class LikeServiceTest {
             userRepository.save(user);
             productRepository.save(product);
 
-            long countBefore = likeRepository.countAll();
+            long countBefore = likeRepository.count();
 
             // act
             likeService.addLike(user.getId(), product.getId());
             likeService.addLike(user.getId(), product.getId());
 
             // assert
-            assertThat(likeRepository.countAll()).isEqualTo(countBefore + 1);
+            assertThat(likeRepository.count()).isEqualTo(countBefore + 1);
         }
 
         @DisplayName("취소할 때, 이미 취소된 상품에 대해서는 멱등적으로 동작한다")

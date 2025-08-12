@@ -1,7 +1,6 @@
 package com.loopers.domain.user;
 
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -15,19 +14,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity save(UserCommand.Create userCreateCommand) {
         if (userCreateCommand == null) {
-            throw new CoreException(ErrorType.BAD_REQUEST, "User creation command cannot be null.");
+            throw new IllegalArgumentException("User creation command cannot be null.");
         }
 
         try {
             return userRepository.save(userCreateCommand.toEntity());
         } catch (DataIntegrityViolationException e) {
-            throw new CoreException(ErrorType.CONFLICT, e.getMessage());
+            throw new IllegalArgumentException(e.getMessage());
         }
     }
 
     @Override
     public UserEntity findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "User not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
     }
 }

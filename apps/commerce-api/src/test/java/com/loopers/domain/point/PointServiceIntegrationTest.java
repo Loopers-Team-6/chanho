@@ -3,9 +3,8 @@ package com.loopers.domain.point;
 import com.loopers.application.user.UserFacade;
 import com.loopers.domain.user.UserGender;
 import com.loopers.interfaces.api.user.UserV1Dto;
-import com.loopers.support.error.CoreException;
-import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -72,8 +71,7 @@ public class PointServiceIntegrationTest {
             Long nonExistentUserId = 999L;
 
             // act & assert
-            CoreException exception = assertThrows(CoreException.class, () -> pointService.findByUserId(nonExistentUserId));
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThrows(EntityNotFoundException.class, () -> pointService.findByUserId(nonExistentUserId));
         }
     }
 
@@ -88,10 +86,7 @@ public class PointServiceIntegrationTest {
             BigDecimal chargeAmount = BigDecimal.valueOf(100);
 
             // act & assert
-            CoreException exception = assertThrows(CoreException.class, () -> {
-                userFacade.charge(nonExistentUserId, chargeAmount);
-            });
-            assertThat(exception.getErrorType()).isEqualTo(ErrorType.NOT_FOUND);
+            assertThrows(EntityNotFoundException.class, () -> userFacade.charge(nonExistentUserId, chargeAmount));
         }
     }
 }

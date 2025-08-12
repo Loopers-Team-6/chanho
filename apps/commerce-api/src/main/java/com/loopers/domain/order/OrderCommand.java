@@ -6,11 +6,23 @@ public class OrderCommand {
 
     public record Place(
             Long userId,
-            List<OrderItemDetail> items
+            List<OrderItemDetail> items,
+            Long couponId
     ) {
         public Place {
             Validator.validateUserId(userId);
             Validator.validateItems(items);
+        }
+
+        public static Place withoutCoupon(Long userId, List<OrderItemDetail> items) {
+            return new Place(userId, items, null);
+        }
+
+        public static Place withCoupon(Long userId, List<OrderItemDetail> items, Long couponId) {
+            if (couponId == null || couponId <= 0) {
+                throw new IllegalArgumentException("쿠폰 ID는 유효해야 합니다.");
+            }
+            return new Place(userId, items, couponId);
         }
     }
 
