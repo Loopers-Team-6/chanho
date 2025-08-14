@@ -11,6 +11,7 @@ import org.springframework.data.domain.Sort;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class FakeProductRepository extends InMemoryCrudRepository<ProductEntity> implements ProductRepository {
 
@@ -37,5 +38,12 @@ public class FakeProductRepository extends InMemoryCrudRepository<ProductEntity>
                 : allProducts.subList(start, end);
 
         return new PageImpl<>(pageContent, pageable, allProducts.size());
+    }
+
+    @Override
+    public Optional<ProductEntity> findByIdWithPessimisticLock(Long id) {
+        return map.values().stream()
+                .filter(product -> product.getId().equals(id))
+                .findFirst();
     }
 }

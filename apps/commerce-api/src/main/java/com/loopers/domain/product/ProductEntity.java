@@ -9,7 +9,12 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "products")
+@Table(
+        name = "products",
+        indexes = {
+                @Index(name = "idx_products_like_count", columnList = "like_count")
+        }
+)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Getter
 public class ProductEntity extends BaseEntity {
@@ -54,6 +59,17 @@ public class ProductEntity extends BaseEntity {
             throw new IllegalArgumentException("재고가 부족합니다.");
         }
         this.stock -= quantityToReduce;
+    }
+
+    public void increaseLikeCount() {
+        this.likeCount++;
+    }
+
+    public void decreaseLikeCount() {
+        if (this.likeCount <= 0) {
+            return;
+        }
+        this.likeCount--;
     }
 
 }
