@@ -8,7 +8,7 @@ import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserGender;
 import com.loopers.domain.user.UserRepository;
 import com.loopers.interfaces.api.ApiResponse;
-import com.loopers.interfaces.api.CustomPageImpl;
+import com.loopers.interfaces.api.PageResponse;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,9 +99,9 @@ public class ProductV1ApiE2ETest {
             httpHeaders.add("X-USER-ID", user1.getId().toString());
 
             // act
-            ParameterizedTypeReference<ApiResponse<CustomPageImpl<ProductV1Dto.ProductInfo>>> responseType = new ParameterizedTypeReference<>() {
+            ParameterizedTypeReference<ApiResponse<PageResponse<ProductV1Dto.ProductInfo>>> responseType = new ParameterizedTypeReference<>() {
             };
-            ResponseEntity<ApiResponse<CustomPageImpl<ProductV1Dto.ProductInfo>>> response =
+            ResponseEntity<ApiResponse<PageResponse<ProductV1Dto.ProductInfo>>> response =
                     testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
             // assert
