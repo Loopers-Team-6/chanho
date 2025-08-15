@@ -1,7 +1,3 @@
-plugins {
-    `java-library`
-}
-
 dependencies {
     // spring
     implementation("org.springframework:spring-web")

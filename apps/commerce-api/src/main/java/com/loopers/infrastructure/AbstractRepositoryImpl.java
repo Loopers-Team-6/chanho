@@ -45,4 +45,13 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, R extends Jpa
                     save(entity);
                 });
     }
+
+    @Override
+    public List<T> saveAll(List<T> entities) {
+        if (entities == null || entities.isEmpty()) {
+            throw new IllegalArgumentException("Entities cannot be null or empty");
+        }
+
+        return jpaRepository.saveAll(entities);
+    }
 }

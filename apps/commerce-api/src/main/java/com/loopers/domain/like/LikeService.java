@@ -4,11 +4,15 @@ import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Service
 @RequiredArgsConstructor
 public class LikeService {
 
@@ -16,20 +20,33 @@ public class LikeService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
+    @Transactional
     public LikeEntity addLike(long userId, long productId) {
         UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다. userId: " + userId));
-        ProductEntity product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다. productId: " + productId));
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. userId: " + userId));
+        ProductEntity product = productRepository.findByIdWithPessimisticLock(productId)
+                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. productId: " + productId));
 
-        LikeEntity newLike = LikeEntity.create(user, product);
+        LikeEntity newLike = likeRepository.saveOrFind(LikeEntity.create(user, product));
 
-        return likeRepository.saveOrFind(newLike);
+        product.increaseLikeCount();
+        productRepository.save(product);
+
+        return newLike;
     }
 
+    @Transactional
     public void removeLike(long userId, long productId) {
         likeRepository.findByUserIdAndProductId(userId, productId)
-                .ifPresent(LikeEntity::delete);
+                .ifPresent(like -> {
+                    like.delete();
+                    likeRepository.save(like);
+
+                    ProductEntity product = productRepository.findByIdWithPessimisticLock(productId)
+                            .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. productId: " + productId));
+                    product.decreaseLikeCount();
+                    productRepository.save(product);
+                });
     }
 
     public boolean isLiked(Long userId, Long productId) {

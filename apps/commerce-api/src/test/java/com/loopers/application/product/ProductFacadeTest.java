@@ -14,12 +14,12 @@ import com.loopers.domain.user.UserRepository;
 import com.loopers.infrastructure.like.FakeLikeRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
 import com.loopers.infrastructure.user.FakeUserRepository;
+import com.loopers.interfaces.api.PageResponse;
 import com.loopers.interfaces.api.product.ProductV1Dto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -113,7 +113,7 @@ public class ProductFacadeTest {
             Pageable pageable = PageRequest.of(0, 10);
 
             // act
-            Page<ProductV1Dto.ProductInfo> results = productFacade.getProducts(pageable, user1.getId());
+            PageResponse<ProductV1Dto.ProductInfo> results = productFacade.getProducts(pageable, user1.getId());
 
             // assert
             assertThat(results.getTotalElements()).isEqualTo(2);

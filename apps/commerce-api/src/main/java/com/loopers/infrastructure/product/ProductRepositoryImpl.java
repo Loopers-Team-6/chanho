@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class ProductRepositoryImpl extends AbstractRepositoryImpl<ProductEntity, ProductJpaRepository> implements ProductRepository {
     public ProductRepositoryImpl(ProductJpaRepository jpaRepository) {
@@ -16,5 +18,10 @@ public class ProductRepositoryImpl extends AbstractRepositoryImpl<ProductEntity,
     @Override
     public Page<ProductEntity> findAll(Pageable pageable) {
         return jpaRepository.findAll(pageable);
+    }
+
+    @Override
+    public Optional<ProductEntity> findByIdWithPessimisticLock(Long id) {
+        return jpaRepository.findByIdWithPessimisticLock(id);
     }
 }

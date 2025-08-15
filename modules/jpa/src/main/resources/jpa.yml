@@ -51,9 +51,14 @@ spring.config.activate.on-profile: test
 
 spring:
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: create
+    properties:
+      hibernate:
+        order_inserts: true
+        jdbc:
+          batch_size: 1000
 
 datasource:
   mysql-jpa:
