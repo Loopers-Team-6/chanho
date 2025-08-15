@@ -104,7 +104,6 @@ public class ProductV1ApiE2ETest {
             ResponseEntity<ApiResponse<CustomPageImpl<ProductV1Dto.ProductInfo>>> response =
                     testRestTemplate.exchange(ENDPOINT, HttpMethod.GET, new HttpEntity<>(httpHeaders), responseType);
 
-
             // assert
             assertAll(
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),

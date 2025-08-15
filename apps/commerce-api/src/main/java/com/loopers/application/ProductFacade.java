@@ -5,6 +5,7 @@ import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductService;
 import com.loopers.interfaces.api.product.ProductV1Dto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class ProductFacade {
     private final LikeService likeService;
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "product", key = "'user:' + #userId + ':product:' + #productId", unless = "#result == null")
     public ProductV1Dto.ProductInfo getProduct(Long productId, Long userId) {
         ProductEntity product = productService.findById(productId);
         boolean isLiked = likeService.isLiked(userId, productId);
@@ -31,6 +33,7 @@ public class ProductFacade {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "products", key = "'user:' + #userId + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort", unless = "#result.isEmpty()")
     public Page<ProductV1Dto.ProductInfo> getProducts(Pageable pageable, Long userId) {
         Page<ProductEntity> products = productService.findAll(pageable);
         List<Long> productIds = products.getContent().stream()
