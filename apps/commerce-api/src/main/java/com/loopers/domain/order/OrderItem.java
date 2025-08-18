@@ -14,14 +14,22 @@ import java.math.BigDecimal;
 public class OrderItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(
+            name = "order_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private OrderEntity order;
+
     @Column(name = "product_id", nullable = false)
     private Long productId;
+
     @Column(name = "product_name", nullable = false, length = 100)
     private String productName;
+
     @Column(name = "price", precision = 10, nullable = false)
     private BigDecimal price;
+
     @Column(name = "quantity", nullable = false)
     private int quantity;
 

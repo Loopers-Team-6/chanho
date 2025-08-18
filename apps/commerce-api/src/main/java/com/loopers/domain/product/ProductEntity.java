@@ -21,10 +21,13 @@ public class ProductEntity extends BaseEntity {
 
     @Column(nullable = false, name = "name", length = 50)
     private String name;
+
     @Column(nullable = false, name = "price", precision = 10)
-    private BigDecimal price;
+    private BigDecimal price = BigDecimal.ZERO;
+
     @Column(nullable = false, name = "stock")
     private int stock;
+
     @ManyToOne
     @JoinColumn(
             name = "brand_id",
@@ -32,10 +35,12 @@ public class ProductEntity extends BaseEntity {
             foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
     )
     private BrandEntity brand;
-    @Column(nullable = false, name = "like_count")
+
+    @Column(nullable = false, name = "like_count", columnDefinition = "bigint default 0")
     private long likeCount;
+
     @Version
-    long version;
+    Long version;
 
     private ProductEntity(String productName, int price, int initialStock, BrandEntity brand) {
         if (productName == null || productName.isBlank() || price <= 0 || initialStock < 0 || brand == null) {
