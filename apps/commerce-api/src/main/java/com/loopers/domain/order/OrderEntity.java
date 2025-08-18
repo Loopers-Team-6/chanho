@@ -18,18 +18,27 @@ import java.util.List;
 public class OrderEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private UserEntity user;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @OrderBy("id ASC")
     private List<OrderItem> items = new ArrayList<>();
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.PENDING;
+
     @Column(name = "original_price", precision = 10, nullable = false)
     private BigDecimal originalPrice = BigDecimal.ZERO;
+
     @Column(name = "final_price", precision = 10, nullable = false)
     private BigDecimal finalPrice = BigDecimal.ZERO;
+
     @Column(name = "applied_coupon_id")
     private Long appliedCouponId = null;
 

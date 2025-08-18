@@ -22,7 +22,11 @@ public class CouponEntity extends BaseEntity {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private UserEntity owner;
 
     @Column(name = "is_used", nullable = false)
@@ -32,7 +36,7 @@ public class CouponEntity extends BaseEntity {
     private DiscountPolicy discountPolicy;
 
     @Version
-    private long version;
+    private Long version;
 
     private CouponEntity(String name, UserEntity owner, DiscountPolicy discountPolicy) {
         Validator.validateName(name);

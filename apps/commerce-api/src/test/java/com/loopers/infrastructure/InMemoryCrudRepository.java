@@ -72,4 +72,11 @@ public class InMemoryCrudRepository<T extends BaseEntity> implements CustomCrudR
         T entity = map.get(id);
         entity.delete();
     }
+
+    @Override
+    public List<T> saveAll(List<T> entities) {
+        return entities.stream()
+                .map(this::save)
+                .toList();
+    }
 }

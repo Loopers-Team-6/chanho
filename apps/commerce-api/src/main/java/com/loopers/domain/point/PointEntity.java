@@ -13,11 +13,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 public class PointEntity extends BaseEntity {
+
     @Column(nullable = false, name = "amount", precision = 10, scale = 0)
     private BigDecimal amount = BigDecimal.ZERO;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private UserEntity user;
 
     public PointEntity(UserEntity user) {

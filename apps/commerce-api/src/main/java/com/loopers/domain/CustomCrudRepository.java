@@ -17,4 +17,5 @@ public interface CustomCrudRepository<T extends BaseEntity> {
 
     void deleteById(Long id);
 
+    List<T> saveAll(List<T> entities);
 }

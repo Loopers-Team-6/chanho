@@ -10,16 +10,34 @@ import lombok.NoArgsConstructor;
 import java.util.Objects;
 
 @Entity
-@Table(name = "likes")
+@Table(
+        name = "likes",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_likes_user_product",
+                columnNames = {"user_id", "product_id"}
+        ),
+        indexes = {
+                @Index(name = "idx_likes_product_id", columnList = "product_id")
+        }
+)
 @NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 @Getter
 public class LikeEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private UserEntity user;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(
+            name = "product_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private ProductEntity product;
 
     private LikeEntity(UserEntity user, ProductEntity product) {
