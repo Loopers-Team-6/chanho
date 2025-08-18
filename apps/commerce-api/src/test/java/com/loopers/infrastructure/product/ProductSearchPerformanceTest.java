@@ -32,9 +32,9 @@ public class ProductSearchPerformanceTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private static final int PRODUCT_COUNT = 100_000;
-    private static final int BRAND_COUNT = 100;
-    private static final int USER_COUNT = 1_000;
+    private static final int PRODUCT_COUNT = 1000000;
+    private static final int BRAND_COUNT = 1000;
+    private static final int USER_COUNT = 10000;
 
     @BeforeAll
     void setup() {
@@ -49,7 +49,8 @@ public class ProductSearchPerformanceTest {
     @Nested
     @DisplayName("브랜드 필터 및 가격순 정렬 시")
     class BrandIdFilterAndPriceSortTest {
-        private final List<Long> brandIdsToSearch = List.of(1L, 2L, 3L);
+        //        private final List<Long> brandIdsToSearch = List.of(1L, 2L, 3L, 4L);
+        private final List<Long> brandIdsToSearch = List.of(200L, 500L, 800L, 999L);
 
         @Test
         @DisplayName("인덱스 유무에 따른 성능을 비교한다")
@@ -74,6 +75,12 @@ public class ProductSearchPerformanceTest {
             performanceTestHelper.analizeTable("products");
             measureBrandIdFilterAndPriceSort("4. 가격 + 브랜드 ID 복합 인덱스");
             performanceTestHelper.executeNativeQueryWithTransaction("DROP INDEX idx_price_brand_id ON products");
+
+            // 5. price 단일 인덱스
+            performanceTestHelper.executeNativeQueryWithTransaction("CREATE INDEX idx_price ON products (price)");
+            performanceTestHelper.analizeTable("products");
+            measureBrandIdFilterAndPriceSort("5. 가격 단일 인덱스");
+            performanceTestHelper.executeNativeQueryWithTransaction("DROP INDEX idx_price ON products");
         }
 
         private void measureBrandIdFilterAndPriceSort(String caseName) {
