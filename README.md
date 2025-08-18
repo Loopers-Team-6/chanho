@@ -37,7 +37,7 @@ Root
 ├── apps ( spring-applications )
 │   └── 📦 commerce-api
 ├── modules ( reusable-configurations )
-│   └── 📦 jpa
+│   ├── 📦 jpa
 │   └── 📦 redis
 └── supports ( add-ons )
     ├── 📦 monitoring
