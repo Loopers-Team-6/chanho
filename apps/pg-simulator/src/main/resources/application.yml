@@ -14,7 +14,7 @@ spring:
   main:
     web-application-type: servlet
   application:
-    name: commerce-api
+    name: pg-simulator
   profiles:
     active: local
   config:
@@ -23,11 +23,6 @@ spring:
       - redis.yml
       - logging.yml
       - monitoring.yml
-
-datasource:
-  mysql-jpa:
-    main:
-      jdbc-url: jdbc:mysql://localhost:3306/paymentgateway
 
 springdoc:
   use-fqn: true
@@ -39,6 +34,17 @@ spring:
   config:
     activate:
       on-profile: local, test
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+
+datasource:
+  mysql-jpa:
+    main:
+      jdbc-url: jdbc:mysql://localhost:3307/paymentgateway
+      username: application
+      password: application
 
 server:
   port: 8082
