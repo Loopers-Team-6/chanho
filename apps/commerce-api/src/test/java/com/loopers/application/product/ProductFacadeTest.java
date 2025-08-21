@@ -51,8 +51,8 @@ public class ProductFacadeTest {
         productFacade = new ProductFacade(productService, likeService);
 
         // 테스트 데이터 생성
-        user1 = userRepository.save(UserEntity.create("user1", "user1@test.com", UserGender.M, LocalDate.now().minusYears(20)));
-        user2 = userRepository.save(UserEntity.create("user2", "user2@test.com", UserGender.F, LocalDate.now().minusYears(30)));
+        user1 = userRepository.save(UserEntity.create("user1", "user1@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
+        user2 = userRepository.save(UserEntity.create("user2", "user2@test.com", UserGender.FEMALE, LocalDate.now().minusYears(30)));
 
         BrandEntity brand = BrandEntity.create("나이키");
         product1 = productRepository.save(ProductEntity.create("신발", 130000, 10, brand));

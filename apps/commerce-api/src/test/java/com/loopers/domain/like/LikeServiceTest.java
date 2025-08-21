@@ -51,7 +51,7 @@ public class LikeServiceTest {
             UserEntity user = UserEntity.create(
                     "user",
                     "test@test.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             );
             ProductEntity product = ProductEntity.create(
@@ -81,7 +81,7 @@ public class LikeServiceTest {
             UserEntity user = UserEntity.create(
                     "user",
                     "test@test.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             );
             ProductEntity product = ProductEntity.create(

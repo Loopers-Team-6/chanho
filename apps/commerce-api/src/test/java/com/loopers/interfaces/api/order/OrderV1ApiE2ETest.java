@@ -47,7 +47,7 @@ public class OrderV1ApiE2ETest {
     void setUp() {
         BrandEntity brand = brandRepository.save(BrandEntity.create("Test Brand"));
         product1 = productRepository.save(ProductEntity.create("Test Product 1", 10000, 10, brand));
-        user = userRepository.save(UserEntity.create("testuser", "test@test.com", UserGender.M, LocalDate.now().minusYears(20)));
+        user = userRepository.save(UserEntity.create("testuser", "test@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
     }
 
     @AfterEach

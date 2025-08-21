@@ -35,7 +35,7 @@ public class PaymentEntityTest {
         user = UserEntity.create(
                 "testUser",
                 "test@test.com",
-                UserGender.M,
+                UserGender.MALE,
                 LocalDate.now().minusYears(20)
         );
     }

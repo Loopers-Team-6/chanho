@@ -5,11 +5,13 @@ import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponService;
-import com.loopers.domain.order.*;
+import com.loopers.domain.order.OrderCommand;
+import com.loopers.domain.order.OrderEntity;
+import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
-import com.loopers.domain.point.PointServiceImpl;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.product.ProductService;
@@ -71,14 +73,14 @@ public class OrderFacadeTest {
                 new UserServiceImpl(userRepository),
                 new OrderService(orderRepository),
                 new ProductService(productRepository),
-                new PointServiceImpl(pointRepository),
+//                new PointServiceImpl(pointRepository),
                 new CouponService(couponRepository)
         );
 
         testUser = userRepository.save(UserEntity.create(
                 "testUser",
                 "test@email.com",
-                UserGender.M,
+                UserGender.MALE,
                 LocalDate.now().minusYears(20)));
         testPoint = pointRepository.save(new PointEntity(testUser));
 

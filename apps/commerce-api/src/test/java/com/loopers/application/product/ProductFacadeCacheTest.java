@@ -61,7 +61,7 @@ public class ProductFacadeCacheTest {
 
     @BeforeEach
     void setUp() {
-        testUser = userRepository.save(UserEntity.create("testuser", "test@test.com", UserGender.M, LocalDate.now().minusYears(20)));
+        testUser = userRepository.save(UserEntity.create("testuser", "test@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
         BrandEntity brand = brandRepository.save(BrandEntity.create("Test Brand"));
         testProduct = productRepository.save(ProductEntity.create("Test Product", 10000, 10, brand));
     }

@@ -75,7 +75,7 @@ public class OrderFacadeConcurrencyTest {
         testUser = UserEntity.create(
                 "test",
                 "test@email.com",
-                UserGender.M,
+                UserGender.MALE,
                 LocalDate.now().minusYears(20));
     }
 
@@ -147,7 +147,7 @@ public class OrderFacadeConcurrencyTest {
         void onlyOneOrderShouldSucceed_whenUsingOneCouponConcurrently() throws InterruptedException {
             // arrange
             final int threadCount = 100;
-            UserEntity userA = userRepository.save(UserEntity.create("userA", "a@test.com", UserGender.M, LocalDate.now().minusYears(20)));
+            UserEntity userA = userRepository.save(UserEntity.create("userA", "a@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
 
             PointEntity pointA = pointRepository.save(new PointEntity(userA));
             pointA.charge(DEFAULT_POINT_AMOUNT);
@@ -204,7 +204,7 @@ public class OrderFacadeConcurrencyTest {
         @Test
         void stockAndCouponShouldBeRolledBack_whenPointIsInsufficient() {
             // arrange
-            UserEntity user = userRepository.save(UserEntity.create("poorUser", "poor@test.com", UserGender.M, LocalDate.now().minusYears(20)));
+            UserEntity user = userRepository.save(UserEntity.create("poorUser", "poor@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
             PointEntity point = new PointEntity(user);
             point.charge(BigDecimal.valueOf(100));
             pointRepository.save(point);
@@ -245,7 +245,7 @@ public class OrderFacadeConcurrencyTest {
             final int threadCount = 5;
 
             // arrange
-            UserEntity user = userRepository.save(UserEntity.create("user", "test@test.com", UserGender.F, LocalDate.now().minusYears(25)));
+            UserEntity user = userRepository.save(UserEntity.create("user", "test@test.com", UserGender.FEMALE, LocalDate.now().minusYears(25)));
             BigDecimal initialPoints = BigDecimal.valueOf(10000000);
             PointEntity point = pointRepository.save(new PointEntity(user));
             point.charge(initialPoints);

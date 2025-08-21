@@ -53,7 +53,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act
@@ -76,7 +76,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act
@@ -97,7 +97,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act

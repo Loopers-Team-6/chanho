@@ -62,7 +62,7 @@ class PointV1ApiE2ETest {
             UserV1Dto.UserResponse saved = userFacade.signUp(new UserV1Dto.SignupRequest(
                     "mwma91",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             ));
 
@@ -90,7 +90,7 @@ class PointV1ApiE2ETest {
             UserV1Dto.UserResponse saved = userFacade.signUp(new UserV1Dto.SignupRequest(
                     "mwma91",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             ));
             // act
@@ -123,7 +123,7 @@ class PointV1ApiE2ETest {
             UserV1Dto.UserResponse saved = userFacade.signUp(new UserV1Dto.SignupRequest(
                     "mwma91",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             ));
 

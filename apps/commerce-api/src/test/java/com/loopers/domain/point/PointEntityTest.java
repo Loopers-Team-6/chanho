@@ -27,7 +27,7 @@ public class PointEntityTest {
             PointEntity point = new PointEntity(UserEntity.create(
                     "testuser",
                     "test@test.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             ));
             assertThrows(IllegalArgumentException.class, () -> point.charge(BigDecimal.ZERO));

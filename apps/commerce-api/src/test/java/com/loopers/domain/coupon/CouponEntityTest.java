@@ -34,7 +34,7 @@ public class CouponEntityTest {
         owner = UserEntity.create(
                 "testuser",
                 "test@test.com",
-                UserGender.M,
+                UserGender.MALE,
                 LocalDate.of(2000, 1, 1));
     }
 

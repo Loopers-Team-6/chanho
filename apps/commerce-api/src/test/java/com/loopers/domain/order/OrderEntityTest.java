@@ -34,7 +34,7 @@ public class OrderEntityTest {
         testUser = UserEntity.create(
                 "testUser",
                 "test@email.com",
-                UserGender.M,
+                UserGender.MALE,
                 LocalDate.now().minusYears(20));
 
         BrandEntity brand = BrandEntity.create("나이키");

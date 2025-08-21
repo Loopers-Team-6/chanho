@@ -52,7 +52,7 @@ public class PointServiceIntegrationTest {
             UserV1Dto.UserResponse saved = userFacade.signUp(new UserV1Dto.SignupRequest(
                     "mwma91",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1)
             ));
 

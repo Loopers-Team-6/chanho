@@ -5,18 +5,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.loopers.util.EnumUtils;
 
 public enum UserGender {
-    M("male"),
-    F("female");
-
-    private final String value;
-
-    UserGender(String value) {
-        this.value = value;
-    }
+    MALE,
+    FEMALE;
 
     @JsonValue
     public String getValue() {
-        return value;
+        return name().toLowerCase();
     }
 
     @JsonCreator
