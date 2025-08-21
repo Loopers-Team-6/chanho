@@ -6,6 +6,7 @@ import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderRepository;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.ProductEntity;
@@ -106,10 +107,10 @@ public class OrderFacadeConcurrencyTest {
                 for (int i = 0; i < threadCount; i++) {
                     executorService.submit(() -> {
                         try {
-                            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+                            OrderCommand.Place command = OrderCommand.Place.create(
                                     savedUser.getId(),
-                                    List.of(new OrderCommand.OrderItemDetail(productA.getId(), 1))
-                            );
+                                    List.of(new OrderCommand.OrderItemDetail(productA.getId(), 1)),
+                                    PaymentMethod.POINT);
                             orderFacade.placeOrder(command);
                             successCount.getAndIncrement();
                         } catch (IllegalArgumentException e) {
@@ -165,7 +166,12 @@ public class OrderFacadeConcurrencyTest {
             for (int i = 0; i < threadCount; i++) {
                 executorService.submit(() -> {
                     try {
-                        orderFacade.placeOrder(new OrderCommand.Place(userA.getId(), List.of(new OrderCommand.OrderItemDetail(product.getId(), 1)), coupon.getId()));
+                        orderFacade.placeOrder(new OrderCommand.Place(
+                                userA.getId(),
+                                List.of(new OrderCommand.OrderItemDetail(product.getId(), 1)),
+                                PaymentMethod.POINT,
+                                coupon.getId()
+                        ));
                         successCount.getAndIncrement();
                     } catch (Exception e) {
                         failCount.getAndIncrement();
@@ -212,6 +218,7 @@ public class OrderFacadeConcurrencyTest {
             OrderCommand.Place command = new OrderCommand.Place(
                     user.getId(),
                     List.of(new OrderCommand.OrderItemDetail(product.getId(), 1)),
+                    PaymentMethod.POINT,
                     coupon.getId()
             );
 
@@ -249,7 +256,7 @@ public class OrderFacadeConcurrencyTest {
             List<OrderCommand.Place> commands = new ArrayList<>();
             for (int i = 0; i < threadCount; i++) {
                 products.add(productRepository.save(ProductEntity.create("상품" + (i + 1), 1000, 100, brand)));
-                commands.add(OrderCommand.Place.withoutCoupon(user.getId(), List.of(new OrderCommand.OrderItemDetail(products.get(i).getId(), 1))));
+                commands.add(OrderCommand.Place.create(user.getId(), List.of(new OrderCommand.OrderItemDetail(products.get(i).getId(), 1)), PaymentMethod.POINT));
             }
 
             ExecutorService executorService = Executors.newFixedThreadPool(threadCount);

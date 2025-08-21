@@ -4,9 +4,7 @@ import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderEntity;
-import com.loopers.domain.order.OrderInfo;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.point.PointService;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.UserEntity;
@@ -28,7 +26,6 @@ public class OrderFacade {
     private final UserService userService;
     private final OrderService orderService;
     private final ProductService productService;
-    private final PointService pointService;
     private final CouponService couponService;
 
     @Retryable(
@@ -53,15 +50,10 @@ public class OrderFacade {
         // 3. 쿠폰 적용 로직
         applyCoupon(order, command.couponId());
 
-        // 4. 최종 가격으로 포인트 차감
-        BigDecimal finalPrice = order.getFinalPrice();
-        pointService.deductPoints(user.getId(), finalPrice);
-
-        // 5. 주문 완료
-        order.complete();
+        // 4. 주문 상태 업데이트
         OrderEntity saved = orderService.save(order);
 
-        return OrderInfo.from(saved);
+        return OrderInfo.from(saved, command.paymentMethod());
     }
 
     private List<OrderItemInfo> prepareAndDecreaseStocks(List<OrderCommand.OrderItemDetail> items) {

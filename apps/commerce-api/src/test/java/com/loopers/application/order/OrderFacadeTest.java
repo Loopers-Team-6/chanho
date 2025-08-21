@@ -6,6 +6,7 @@ import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponRepository;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.*;
+import com.loopers.domain.payment.PaymentMethod;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.point.PointServiceImpl;
@@ -94,13 +95,13 @@ public class OrderFacadeTest {
         @Test
         void createOrderWithIntestUser() {
             // arrange
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     999L,
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), 2),
                             new OrderCommand.OrderItemDetail(productA.getId(), 1)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
 
             // act & assert
             assertThrows(EntityNotFoundException.class, () -> orderFacade.placeOrder(command));
@@ -119,13 +120,13 @@ public class OrderFacadeTest {
             // arrange
             testPoint.charge(DEFAULT_POINT_AMOUNT);
             pointRepository.save(testPoint);
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), 2),
                             new OrderCommand.OrderItemDetail(productB.getId(), 1)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
 
             // act
             orderFacade.placeOrder(command);
@@ -144,7 +145,7 @@ public class OrderFacadeTest {
             // arrange
             Long userId = testUser.getId();
             // act & assert
-            assertThrows(IllegalArgumentException.class, () -> OrderCommand.Place.withoutCoupon(userId, Arrays.asList(null, null)));
+            assertThrows(IllegalArgumentException.class, () -> OrderCommand.Place.create(userId, Arrays.asList(null, null), PaymentMethod.POINT));
         }
 
         @DisplayName("올바르게 주문이 생성되면, 재고가 차감된다")
@@ -159,13 +160,13 @@ public class OrderFacadeTest {
             int quantityA = 2;
             int quantityB = 1;
 
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), quantityA),
                             new OrderCommand.OrderItemDetail(productB.getId(), quantityB)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
 
             // act
             orderFacade.placeOrder(command);
@@ -184,13 +185,13 @@ public class OrderFacadeTest {
             // arrange
             testPoint.charge(DEFAULT_POINT_AMOUNT);
             pointRepository.save(testPoint);
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), 2),
                             new OrderCommand.OrderItemDetail(productB.getId(), 1)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
 
             // act
             OrderInfo orderInfo = orderFacade.placeOrder(command);
@@ -205,13 +206,13 @@ public class OrderFacadeTest {
             // arrange
             testPoint.charge(DEFAULT_POINT_AMOUNT);
             pointRepository.save(testPoint);
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), 2),
                             new OrderCommand.OrderItemDetail(productB.getId(), 1)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
             BigDecimal totalPrice = productA.getPrice().multiply(BigDecimal.valueOf(2))
                     .add(productB.getPrice().multiply(BigDecimal.valueOf(1)));
 
@@ -230,13 +231,13 @@ public class OrderFacadeTest {
         void failOrderWhenInsufficientPoints() {
             // arrange
             pointRepository.save(testPoint);
-            OrderCommand.Place command = OrderCommand.Place.withoutCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(
                             new OrderCommand.OrderItemDetail(productA.getId(), 2),
                             new OrderCommand.OrderItemDetail(productB.getId(), 1)
-                    )
-            );
+                    ),
+                    PaymentMethod.POINT);
             BigDecimal totalPrice = productA.getPrice().multiply(BigDecimal.valueOf(2))
                     .add(productB.getPrice().multiply(BigDecimal.valueOf(1)));
 
@@ -263,9 +264,10 @@ public class OrderFacadeTest {
             BigDecimal initialPoints = testPoint.getAmount();
 
             // act
-            OrderCommand.Place command = OrderCommand.Place.withCoupon(
+            OrderCommand.Place command = OrderCommand.Place.create(
                     testUser.getId(),
                     List.of(new OrderCommand.OrderItemDetail(productA.getId(), orderQuantity)),
+                    PaymentMethod.POINT,
                     coupon.getId()
             );
             orderFacade.placeOrder(command);
