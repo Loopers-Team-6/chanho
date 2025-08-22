@@ -4,8 +4,6 @@ import com.loopers.domain.brand.BrandEntity;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponRepository;
-import com.loopers.domain.coupon.CouponService;
-import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderEntity;
 import com.loopers.domain.order.OrderRepository;
 import com.loopers.domain.order.OrderService;
