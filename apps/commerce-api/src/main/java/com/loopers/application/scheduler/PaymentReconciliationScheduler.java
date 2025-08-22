@@ -48,7 +48,7 @@ public class PaymentReconciliationScheduler {
                 PaymentV1Dto.TransactionDetailResponse pgStatus = pgClient.getPaymentTransactionDetail(pgUserId, transactionKey);
 
                 TransactionStatus transactionStatus = pgStatus.data().status();
-                paymentService.processPaymentCallback(
+                paymentService.confirmPayment(
                         new PaymentCommand.Update(transactionStatus, transactionKey)
                 );
                 log.info("결제 ID {}의 상태를 {}로 업데이트했습니다.", payment.getId(), transactionStatus);

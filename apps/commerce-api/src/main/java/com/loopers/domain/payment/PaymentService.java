@@ -31,7 +31,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public void createPayment(Long orderId, PaymentMethod paymentMethod, BigDecimal amount) {
+    public void requestPayment(Long orderId, PaymentMethod paymentMethod, BigDecimal amount) {
         PaymentProcessor paymentProcessor = getPaymentProcessor(paymentMethod);
 
         PaymentEntity payment = paymentRepository.save(paymentProcessor.createPayment(orderId, amount));
@@ -42,7 +42,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public void processPaymentCallback(PaymentCommand.Update command) {
+    public void confirmPayment(PaymentCommand.Update command) {
         if (command == null) {
             throw new IllegalArgumentException("Invalid payment command");
         }

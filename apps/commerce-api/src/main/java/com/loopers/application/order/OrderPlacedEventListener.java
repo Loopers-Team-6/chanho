@@ -20,6 +20,6 @@ public class OrderPlacedEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrderPlacedEvent(OrderPlacedEvent event) {
-        paymentService.createPayment(event.orderId(), event.paymentMethod(), event.amount());
+        paymentService.requestPayment(event.orderId(), event.paymentMethod(), event.amount());
     }
 }
