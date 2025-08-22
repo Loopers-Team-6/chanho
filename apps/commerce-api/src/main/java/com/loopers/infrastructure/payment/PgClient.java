@@ -14,14 +14,14 @@ public interface PgClient {
     );
 
     @GetMapping("/api/v1/payments/{transactionKey}")
-    PaymentV1Dto.TransactionDetailResponse getPaymentTransactionDetail(
+    PaymentV1Dto.TransactionDetailResponse findPaymentTransactionDetailByKey(
             @RequestHeader("X-USER-ID") Long userId,
             @PathVariable("transactionKey") String transactionKey
     );
 
     @GetMapping("/api/v1/payments")
-    PaymentV1Dto.OrderResponse getPaymentOrderResponse(
+    PaymentV1Dto.OrderResponse findPaymentsByOrderId(
             @RequestHeader("X-USER-ID") Long userId,
-            @RequestParam("orderId") String orderId
+            @RequestParam("orderId") Long orderId
     );
 }

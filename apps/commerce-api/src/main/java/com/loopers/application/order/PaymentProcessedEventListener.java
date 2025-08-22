@@ -29,7 +29,7 @@ public class PaymentProcessedEventListener {
 
         OrderEntity order = orderService.findById(event.orderId());
         switch (event.paymentStatus()) {
-            case COMPLETED -> order.complete();
+            case SUCCESS -> order.complete();
             case FAILED -> order.fail();
         }
         orderService.save(order);

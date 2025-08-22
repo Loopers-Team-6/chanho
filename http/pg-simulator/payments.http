@@ -16,5 +16,5 @@ GET {{pg-simulator}}/api/v1/payments/20250822:TR:ad0d4d
 X-USER-ID: 1
 
 ### 주문에 엮인 결제 정보 조회
-GET {{pg-simulator}}/api/v1/payments?orderId=4
+GET {{pg-simulator}}/api/v1/payments?orderId=1351039135
 X-USER-ID: 1

@@ -19,13 +19,13 @@ public class PaymentEntityTest {
 
     /*
      * 결제 도메인 테스트
-     * - [x] 주문 정보를 받아 PENDING 상태로 결제 요청을 생성한다.
+     * - [x] 주문 정보를 받아 CREATED 상태로 결제 요청을 생성한다.
      * - [x] 결제 요청은 주문의 최종 가격을 금액으로 설정한다.
-     * - [x] 결제 요청을 완료하면 COMPLETED 상태로 변경한다.
+     * - [x] 결제 요청을 완료하면 PENDING 상태로 변경한다.
      * - [x] 결제 요청을 취소하면 CANCELED 상태로 변경한다
      * - [x] 결제 요청이 실패하면 FAILED 상태로 변경한다.
      * - [x] 결제 요청의 상태는 멱등적으로 변경된다.
-     * - [x] 이미 변경된 상태는 다시 변경할 수 없다.
+     * - [x] 한 번 변경된 상태는 이전으로 돌아갈 수 없다.
      */
 
     private UserEntity user;
@@ -89,10 +89,10 @@ public class PaymentEntityTest {
             PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
-            payment.complete();
+            payment.markAsSuccess();
 
             // assert
-            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
+            assertThat(payment.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
         }
 
         @DisplayName("결제 요청을 취소하면 CANCELED 상태로 변경한다")
@@ -103,7 +103,7 @@ public class PaymentEntityTest {
             PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
-            payment.cancel();
+            payment.markAsCanceled();
 
             // assert
             assertThat(payment.getStatus()).isEqualTo(PaymentStatus.CANCELED);
@@ -117,7 +117,7 @@ public class PaymentEntityTest {
             PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
-            payment.fail();
+            payment.markAsFailed();
 
             // assert
             assertThat(payment.getStatus()).isEqualTo(PaymentStatus.FAILED);
@@ -133,23 +133,23 @@ public class PaymentEntityTest {
             PaymentEntity payment3 = PointPaymentEntity.create(order);
 
             // act & assert
-            payment1.complete();
-            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-            payment1.complete();
-            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-            payment1.complete();
-            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-            payment2.cancel();
+            payment1.markAsSuccess();
+            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+            payment1.markAsSuccess();
+            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+            payment1.markAsSuccess();
+            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+            payment2.markAsCanceled();
             assertThat(payment2.getStatus()).isEqualTo(PaymentStatus.CANCELED);
-            payment2.cancel();
+            payment2.markAsCanceled();
             assertThat(payment2.getStatus()).isEqualTo(PaymentStatus.CANCELED);
-            payment2.cancel();
+            payment2.markAsCanceled();
             assertThat(payment2.getStatus()).isEqualTo(PaymentStatus.CANCELED);
-            payment3.fail();
+            payment3.markAsFailed();
             assertThat(payment3.getStatus()).isEqualTo(PaymentStatus.FAILED);
-            payment3.fail();
+            payment3.markAsFailed();
             assertThat(payment3.getStatus()).isEqualTo(PaymentStatus.FAILED);
-            payment3.fail();
+            payment3.markAsFailed();
             assertThat(payment3.getStatus()).isEqualTo(PaymentStatus.FAILED);
         }
 
@@ -163,25 +163,25 @@ public class PaymentEntityTest {
             PaymentEntity payment3 = PointPaymentEntity.create(order);
 
             // act & assert
-            payment1.complete();
-            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.COMPLETED);
-            payment2.cancel();
+            payment1.markAsSuccess();
+            assertThat(payment1.getStatus()).isEqualTo(PaymentStatus.SUCCESS);
+            payment2.markAsCanceled();
             assertThat(payment2.getStatus()).isEqualTo(PaymentStatus.CANCELED);
-            payment3.fail();
+            payment3.markAsFailed();
             assertThat(payment3.getStatus()).isEqualTo(PaymentStatus.FAILED);
 
             // 동일한 상태로 변경시 멱등적으로 동작한다
-            payment1.complete();
-            payment2.cancel();
-            payment3.fail();
+            payment1.markAsSuccess();
+            payment2.markAsCanceled();
+            payment3.markAsFailed();
 
             // 이미 변경된 상태는 다시 변경할 수 없다
-            assertThrows(IllegalStateException.class, payment1::cancel);
-            assertThrows(IllegalStateException.class, payment1::fail);
-            assertThrows(IllegalStateException.class, payment2::complete);
-            assertThrows(IllegalStateException.class, payment2::fail);
-            assertThrows(IllegalStateException.class, payment3::complete);
-            assertThrows(IllegalStateException.class, payment3::cancel);
+            assertThrows(IllegalStateException.class, payment1::markAsCanceled);
+            assertThrows(IllegalStateException.class, payment1::markAsFailed);
+            assertThrows(IllegalStateException.class, payment2::markAsSuccess);
+            assertThrows(IllegalStateException.class, payment2::markAsFailed);
+            assertThrows(IllegalStateException.class, payment3::markAsSuccess);
+            assertThrows(IllegalStateException.class, payment3::markAsCanceled);
         }
 
     }

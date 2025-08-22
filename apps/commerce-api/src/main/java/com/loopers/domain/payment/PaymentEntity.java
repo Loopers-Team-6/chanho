@@ -34,19 +34,39 @@ public abstract class PaymentEntity extends BaseEntity {
         this.orderId = orderId;
         this.method = method;
         this.amount = amout;
-        this.status = PaymentStatus.PENDING;
+        this.status = PaymentStatus.CREATED;
     }
 
-    public void complete() {
-        changePaymentStatus(PaymentStatus.COMPLETED);
+    public boolean isPending() {
+        return this.status == PaymentStatus.PENDING;
     }
 
-    public void cancel() {
-        changePaymentStatus(PaymentStatus.CANCELED);
+    public boolean isSuccess() {
+        return this.status == PaymentStatus.SUCCESS;
     }
 
-    public void fail() {
+    public boolean isFailed() {
+        return this.status == PaymentStatus.FAILED;
+    }
+
+    public boolean isCanceled() {
+        return this.status == PaymentStatus.CANCELED;
+    }
+
+    public void markAsPending() {
+        changePaymentStatus(PaymentStatus.PENDING);
+    }
+
+    public void markAsSuccess() {
+        changePaymentStatus(PaymentStatus.SUCCESS);
+    }
+
+    public void markAsFailed() {
         changePaymentStatus(PaymentStatus.FAILED);
+    }
+
+    public void markAsCanceled() {
+        changePaymentStatus(PaymentStatus.CANCELED);
     }
 
     private void changePaymentStatus(PaymentStatus newStatus) {
@@ -54,11 +74,10 @@ public abstract class PaymentEntity extends BaseEntity {
             return;
         }
 
-        if (this.status != PaymentStatus.PENDING) {
-            throw new IllegalStateException("결제 상태가 PENDING이 아닙니다. 현재 상태: " + this.status);
+        if (!this.status.canTransitionTo(newStatus)) {
+            throw new IllegalStateException("결제 상태를 변경할 수 없습니다. 현재 상태: " + this.status + ", 변경하려는 상태: " + newStatus);
         }
 
         this.status = newStatus;
     }
-
 }

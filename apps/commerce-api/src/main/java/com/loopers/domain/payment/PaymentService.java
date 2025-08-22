@@ -8,9 +8,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -34,6 +36,7 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
+    @Transactional
     public void requestPayment(Long orderId, PaymentMethod paymentMethod, BigDecimal amount) {
         PaymentProcessor paymentProcessor = getPaymentProcessor(paymentMethod);
 
@@ -48,6 +51,15 @@ public class PaymentService {
         }
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void processAndSyncStatus(PaymentEntity payment) {
+        PaymentProcessor paymentProcessor = getPaymentProcessor(payment.getMethod());
+        paymentProcessor.processPayment(payment);
+        paymentRepository.save(payment);
+
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+    }
+
     @Transactional
     public void confirmPayment(PaymentCommand.Update command) {
         if (command == null) {
@@ -59,12 +71,20 @@ public class PaymentService {
 
         PaymentEntity payment = findByTransactionKey(command.transactionKey());
         switch (command.status()) {
-            case SUCCESS -> payment.complete();
-            case FAILED -> payment.fail();
+            case SUCCESS -> payment.markAsSuccess();
+            case FAILED -> payment.markAsFailed();
         }
 
         paymentRepository.save(payment);
         eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+    }
+
+    public List<PaymentEntity> findPaymentsToRetry(ZonedDateTime threshold) {
+        return paymentRepository.findAllByStatusAndCreatedAtBefore(PaymentStatus.CREATED, threshold);
+    }
+
+    public List<PaymentEntity> findPendingPayments(ZonedDateTime threshold) {
+        return paymentRepository.findAllByStatusAndCreatedAtBefore(PaymentStatus.PENDING, threshold);
     }
 
     public PaymentEntity findByOrderId(Long id) {

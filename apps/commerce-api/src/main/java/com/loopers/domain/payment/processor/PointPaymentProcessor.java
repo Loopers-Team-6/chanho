@@ -37,13 +37,11 @@ public class PointPaymentProcessor implements PaymentProcessor {
 
         try {
             pointService.deductPoints(userId, finalPrice);
+            payment.markAsSuccess();
         } catch (IllegalStateException e) {
-            payment.fail();
+            payment.markAsFailed();
             order.fail();
             orderService.save(order);
-            return;
         }
-
-        payment.complete();
     }
 }

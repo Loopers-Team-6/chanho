@@ -96,6 +96,10 @@ public class PaymentV1Dto {
         public boolean isSuccess() {
             return meta.isSuccess();
         }
+
+        public boolean isFail() {
+            return meta.isFail();
+        }
     }
 
     public record TransactionDetailResponse(
