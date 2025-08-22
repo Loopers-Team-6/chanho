@@ -45,9 +45,8 @@ public class OrderV1ApiController implements OrderV1ApiSpec {
         }
 
         long userId = Long.parseLong(request.getHeader("X-USER-ID"));
-        System.out.println("orderId = " + orderId);
-        System.out.println("userId = " + userId);
+        OrderInfo orderInfo = orderFacade.getOrder(OrderCommand.Find.create(orderId, userId));
 
-        return ApiResponse.success(null);
+        return ApiResponse.success(OrderV1Dto.OrderResponse.from(orderInfo));
     }
 }

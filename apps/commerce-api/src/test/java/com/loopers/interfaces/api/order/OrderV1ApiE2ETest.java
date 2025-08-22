@@ -3,6 +3,8 @@ package com.loopers.interfaces.api.order;
 import com.loopers.domain.brand.BrandEntity;
 import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.payment.PaymentMethod;
+import com.loopers.domain.point.PointEntity;
+import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
@@ -40,14 +42,21 @@ public class OrderV1ApiE2ETest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PointRepository pointRepository;
+
     private ProductEntity product1;
     private UserEntity user;
+    private PointEntity point;
 
     @BeforeEach
     void setUp() {
         BrandEntity brand = brandRepository.save(BrandEntity.create("Test Brand"));
         product1 = productRepository.save(ProductEntity.create("Test Product 1", 10000, 10, brand));
         user = userRepository.save(UserEntity.create("testuser", "test@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
+        PointEntity point = PointEntity.create(user);
+        point.charge(BigDecimal.valueOf(999999L));
+        point = pointRepository.save(point);
     }
 
     @AfterEach
@@ -82,7 +91,7 @@ public class OrderV1ApiE2ETest {
                                 "quantity": 2
                             }
                         ],
-                        "paymentMethod": "CARD",
+                        "paymentMethod": "POINT",
                         "couponId": null
                     }
                     """.formatted(product1.getId());
@@ -101,7 +110,7 @@ public class OrderV1ApiE2ETest {
                     () -> assertThat(response.getBody().data().items()).hasSize(1),
                     () -> assertThat(response.getBody().data().items().get(0).productId()).isEqualTo(product1.getId()),
                     () -> assertThat(response.getBody().data().items().get(0).quantity()).isEqualTo(2),
-                    () -> assertThat(response.getBody().data().paymentMethod()).isEqualTo(PaymentMethod.CARD),
+                    () -> assertThat(response.getBody().data().paymentMethod()).isEqualTo(PaymentMethod.POINT),
                     () -> assertThat(response.getBody().data().totalPrice()).isEqualTo(product1.getPrice().multiply(BigDecimal.valueOf(2)).toPlainString())
             );
         }

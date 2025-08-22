@@ -33,6 +33,7 @@ public class PointServiceImpl implements PointService {
         PointEntity point = findByUserIdWithPessimisticLock(userId);
 
         point.use(points);
+        pointRepository.save(point);
     }
 
     @Override

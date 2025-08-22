@@ -36,7 +36,7 @@ public class OrderInfo {
                 orderEntity.getItems().stream()
                         .map(OrderItemInfo::from)
                         .toList(),
-                orderEntity.getOriginalPrice()
+                orderEntity.getFinalPrice()
         );
     }
 }

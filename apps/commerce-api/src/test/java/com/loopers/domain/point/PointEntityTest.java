@@ -24,7 +24,7 @@ public class PointEntityTest {
         @DisplayName("0 이하의 정수로 포인트를 충전 시 실패한다.")
         @Test
         void failedToChargePoint_whenAmountIsZeroOrNegative() {
-            PointEntity point = new PointEntity(UserEntity.create(
+            PointEntity point = PointEntity.create(UserEntity.create(
                     "testuser",
                     "test@test.com",
                     UserGender.MALE,

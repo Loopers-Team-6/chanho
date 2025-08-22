@@ -1,7 +1,6 @@
 package com.loopers.domain.payment;
 
 import com.loopers.domain.BaseEntity;
-import com.loopers.domain.order.OrderEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,19 +10,16 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "payments")
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "method", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PaymentEntity extends BaseEntity {
+public abstract class PaymentEntity extends BaseEntity {
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-            name = "order_id",
-            nullable = false,
-            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
-    )
-    private OrderEntity order;
+    @Column(name = "order_id", nullable = false)
+    private Long orderId;
 
-    @Column(name = "method", nullable = false)
+    @Column(name = "method", nullable = false, insertable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private PaymentMethod method;
 
@@ -34,15 +30,11 @@ public class PaymentEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
-    private PaymentEntity(OrderEntity order, PaymentMethod method) {
-        this.order = order;
+    protected PaymentEntity(Long orderId, PaymentMethod method, BigDecimal amout) {
+        this.orderId = orderId;
         this.method = method;
-        this.amount = order.getFinalPrice();
+        this.amount = amout;
         this.status = PaymentStatus.PENDING;
-    }
-
-    public static PaymentEntity create(OrderEntity order, PaymentMethod method) {
-        return new PaymentEntity(order, method);
     }
 
     public void complete() {

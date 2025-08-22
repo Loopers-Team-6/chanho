@@ -40,7 +40,7 @@ public class UserFacade {
         );
 
         UserEntity saved = userService.save(create);
-        PointEntity point = pointService.save(new PointEntity(saved));
+        PointEntity point = pointService.save(PointEntity.create(saved));
 
         return UserV1Dto.UserResponse.from(saved);
     }

@@ -51,7 +51,7 @@ public class PaymentEntityTest {
             OrderEntity order = OrderEntity.create(user);
 
             // act
-            PaymentEntity payment = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment = PointPaymentEntity.create(order);
 
             // assert
             assertThat(payment.getStatus()).isEqualTo(PaymentStatus.PENDING);
@@ -70,7 +70,7 @@ public class PaymentEntityTest {
             ));
 
             // act
-            PaymentEntity payment = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment = PointPaymentEntity.create(order);
 
             // assert
             assertThat(payment.getAmount()).isEqualTo(order.getFinalPrice());
@@ -86,7 +86,7 @@ public class PaymentEntityTest {
         void completePaymentRequest() {
             // arrange
             OrderEntity order = OrderEntity.create(user);
-            PaymentEntity payment = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
             payment.complete();
@@ -100,7 +100,7 @@ public class PaymentEntityTest {
         void cancelPaymentRequest() {
             // arrange
             OrderEntity order = OrderEntity.create(user);
-            PaymentEntity payment = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
             payment.cancel();
@@ -114,7 +114,7 @@ public class PaymentEntityTest {
         void failPaymentRequest() {
             // arrange
             OrderEntity order = OrderEntity.create(user);
-            PaymentEntity payment = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment = PointPaymentEntity.create(order);
 
             // act
             payment.fail();
@@ -128,9 +128,9 @@ public class PaymentEntityTest {
         void idempotentPaymentStatusChange() {
             // arrange
             OrderEntity order = OrderEntity.create(user);
-            PaymentEntity payment1 = PaymentEntity.create(order, PaymentMethod.POINT);
-            PaymentEntity payment2 = PaymentEntity.create(order, PaymentMethod.POINT);
-            PaymentEntity payment3 = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment1 = PointPaymentEntity.create(order);
+            PaymentEntity payment2 = PointPaymentEntity.create(order);
+            PaymentEntity payment3 = PointPaymentEntity.create(order);
 
             // act & assert
             payment1.complete();
@@ -158,9 +158,9 @@ public class PaymentEntityTest {
         void invalidPaymentStatusTransition() {
             // arrange
             OrderEntity order = OrderEntity.create(user);
-            PaymentEntity payment1 = PaymentEntity.create(order, PaymentMethod.POINT);
-            PaymentEntity payment2 = PaymentEntity.create(order, PaymentMethod.POINT);
-            PaymentEntity payment3 = PaymentEntity.create(order, PaymentMethod.POINT);
+            PaymentEntity payment1 = PointPaymentEntity.create(order);
+            PaymentEntity payment2 = PointPaymentEntity.create(order);
+            PaymentEntity payment3 = PointPaymentEntity.create(order);
 
             // act & assert
             payment1.complete();

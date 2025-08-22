@@ -40,10 +40,30 @@ public class OrderCommand {
         }
     }
 
+    public record Find(
+            Long orderId,
+            Long userId
+    ) {
+        public Find {
+            Validator.validateUserId(userId);
+            Validator.validateOrderId(orderId);
+        }
+
+        public static Find create(Long orderId, long userId) {
+            return new Find(orderId, userId);
+        }
+    }
+
     static class Validator {
         public static void validateUserId(Long userId) {
             if (userId == null || userId <= 0) {
                 throw new IllegalArgumentException("사용자 ID는 유효해야 합니다.");
+            }
+        }
+
+        public static void validateOrderId(Long orderId) {
+            if (orderId == null || orderId <= 0) {
+                throw new IllegalArgumentException("주문 ID는 유효해야 합니다.");
             }
         }
 
