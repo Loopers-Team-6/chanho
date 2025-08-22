@@ -34,12 +34,10 @@ spring:
             connect-timeout: 1000
             read-timeout: 6000
 
-
 springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
-
 
 resilience4j:
   # --- 재시도 설정 ---
@@ -61,7 +59,6 @@ resilience4j:
           - feign.FeignException.Unauthorized # 401 Unauthorized
           - feign.FeignException.Forbidden # 403 Forbidden
           - feign.FeignException.NotFound # 404 Not Found
-
   # --- 서킷 브레이커 설정 ---
   circuitbreaker:
     instances:
