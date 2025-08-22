@@ -2,7 +2,6 @@ package com.loopers.application.user;
 
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointService;
-import com.loopers.domain.user.UserCommand;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserService;
 import com.loopers.interfaces.api.point.PointV1Dto;

@@ -1,5 +1,7 @@
-package com.loopers.domain.user;
+package com.loopers.application.user;
 
+import com.loopers.domain.user.UserEntity;
+import com.loopers.domain.user.UserGender;
 import lombok.Getter;
 
 import java.time.LocalDate;
