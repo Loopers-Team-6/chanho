@@ -4,7 +4,9 @@ import com.loopers.application.payment.PaymentCommand;
 import com.loopers.domain.payment.processor.PaymentProcessor;
 import com.loopers.interfaces.api.payment.TransactionStatus;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +17,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class PaymentService {
 
     private final ApplicationEventPublisher eventPublisher;
@@ -34,11 +37,15 @@ public class PaymentService {
     public void requestPayment(Long orderId, PaymentMethod paymentMethod, BigDecimal amount) {
         PaymentProcessor paymentProcessor = getPaymentProcessor(paymentMethod);
 
-        PaymentEntity payment = paymentRepository.save(paymentProcessor.createPayment(orderId, amount));
-        paymentProcessor.processPayment(payment);
-        paymentRepository.save(payment);
+        try {
+            PaymentEntity payment = paymentRepository.save(paymentProcessor.createPayment(orderId, amount));
+            paymentProcessor.processPayment(payment);
+            paymentRepository.save(payment);
 
-        eventPublisher.publishEvent(new PaymentProcessedEvent(orderId, payment.getId(), payment.getStatus()));
+            eventPublisher.publishEvent(new PaymentProcessedEvent(orderId, payment.getId(), payment.getStatus()));
+        } catch (DataIntegrityViolationException e) {
+            log.warn("결제 요청 중복 발생 Order ID: [{}], Payment Method: [{}]", orderId, paymentMethod);
+        }
     }
 
     @Transactional

@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public abstract class PaymentEntity extends BaseEntity {
 
-    @Column(name = "order_id", nullable = false)
+    @Column(name = "order_id", nullable = false, unique = true)
     private Long orderId;
 
     @Column(name = "method", nullable = false, insertable = false, updatable = false)
