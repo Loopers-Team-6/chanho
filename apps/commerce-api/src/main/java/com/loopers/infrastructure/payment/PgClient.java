@@ -4,7 +4,7 @@ import com.loopers.interfaces.api.payment.PaymentV1Dto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "pgClient", url = "${pg.simulator.url}")
+@FeignClient(name = "pg-client", url = "${pg.simulator.url}")
 public interface PgClient {
 
     @PostMapping("/api/v1/payments")
