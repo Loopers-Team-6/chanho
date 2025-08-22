@@ -35,7 +35,14 @@ public class PointPaymentProcessor implements PaymentProcessor {
         Long userId = order.getUser().getId();
         BigDecimal finalPrice = order.getFinalPrice();
 
-        pointService.deductPoints(userId, finalPrice);
+        try {
+            pointService.deductPoints(userId, finalPrice);
+        } catch (IllegalStateException e) {
+            payment.fail();
+            order.fail();
+            orderService.save(order);
+            return;
+        }
 
         payment.complete();
     }

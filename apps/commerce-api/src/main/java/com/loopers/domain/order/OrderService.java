@@ -18,5 +18,4 @@ public class OrderService {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
     }
-
 }

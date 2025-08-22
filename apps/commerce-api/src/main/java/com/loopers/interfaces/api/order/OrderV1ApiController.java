@@ -19,7 +19,9 @@ public class OrderV1ApiController implements OrderV1ApiSpec {
 
     @PostMapping
     @Override
-    public ApiResponse<OrderV1Dto.OrderResponse> createOrder(HttpServletRequest request, @RequestBody OrderV1Dto.OrderRequest orderRequest) {
+    public ApiResponse<OrderV1Dto.OrderResponse> createOrder(
+            HttpServletRequest request,
+            @RequestBody OrderV1Dto.OrderRequest orderRequest) {
         if (request.getHeader("X-USER-ID") == null) {
             throw new CoreException(ErrorType.NOT_FOUND, "User ID is missing in the request header.");
         }
