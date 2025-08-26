@@ -48,6 +48,7 @@ public class CardPaymentProcessor implements PaymentProcessor {
             log.info("이미 결제 요청된 주문입니다. orderId: [{}]", payment.getOrderId());
             PaymentV1Dto.TransactionInfo transactionInfo = paymentsByOrderId.data().transactions().getLast();
             updatePayment(payment, transactionInfo.transactionKey(), transactionInfo.status());
+            return;
         }
 
         log.info("결제 요청 내역이 아직 없습니다. 신규 결제를 요청합니다. orderId: [{}]", payment.getOrderId());
