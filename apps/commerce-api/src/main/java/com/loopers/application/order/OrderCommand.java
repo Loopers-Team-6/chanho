@@ -1,4 +1,6 @@
-package com.loopers.domain.order;
+package com.loopers.application.order;
+
+import com.loopers.domain.payment.PaymentMethod;
 
 import java.util.List;
 
@@ -7,6 +9,7 @@ public class OrderCommand {
     public record Place(
             Long userId,
             List<OrderItemDetail> items,
+            PaymentMethod paymentMethod,
             Long couponId
     ) {
         public Place {
@@ -14,15 +17,12 @@ public class OrderCommand {
             Validator.validateItems(items);
         }
 
-        public static Place withoutCoupon(Long userId, List<OrderItemDetail> items) {
-            return new Place(userId, items, null);
+        public static Place create(Long userId, List<OrderItemDetail> items, PaymentMethod paymentMethod) {
+            return new Place(userId, items, paymentMethod, null);
         }
 
-        public static Place withCoupon(Long userId, List<OrderItemDetail> items, Long couponId) {
-            if (couponId == null || couponId <= 0) {
-                throw new IllegalArgumentException("쿠폰 ID는 유효해야 합니다.");
-            }
-            return new Place(userId, items, couponId);
+        public static Place create(Long userId, List<OrderItemDetail> items, PaymentMethod paymentMethod, Long couponId) {
+            return new Place(userId, items, paymentMethod, couponId);
         }
     }
 
@@ -40,10 +40,30 @@ public class OrderCommand {
         }
     }
 
+    public record Find(
+            Long orderId,
+            Long userId
+    ) {
+        public Find {
+            Validator.validateUserId(userId);
+            Validator.validateOrderId(orderId);
+        }
+
+        public static Find create(Long orderId, long userId) {
+            return new Find(orderId, userId);
+        }
+    }
+
     static class Validator {
         public static void validateUserId(Long userId) {
             if (userId == null || userId <= 0) {
                 throw new IllegalArgumentException("사용자 ID는 유효해야 합니다.");
+            }
+        }
+
+        public static void validateOrderId(Long orderId) {
+            if (orderId == null || orderId <= 0) {
+                throw new IllegalArgumentException("주문 ID는 유효해야 합니다.");
             }
         }
 

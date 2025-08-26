@@ -1,9 +1,7 @@
 package com.loopers.domain.user;
 
 import com.loopers.domain.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +20,7 @@ public class UserEntity extends BaseEntity {
     @Column(unique = true, nullable = false, length = 50, name = "email")
     private String email;
     @Column(nullable = false, name = "gender")
+    @Enumerated(EnumType.STRING)
     private UserGender gender;
     @Column(nullable = false, name = "birth")
     private LocalDate birth;

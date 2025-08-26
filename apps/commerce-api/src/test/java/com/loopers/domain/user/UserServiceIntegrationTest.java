@@ -1,5 +1,6 @@
 package com.loopers.domain.user;
 
+import com.loopers.application.user.UserCommand;
 import com.loopers.utils.DatabaseCleanUp;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.AfterEach;
@@ -53,7 +54,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act
@@ -76,7 +77,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act
@@ -97,7 +98,7 @@ class UserServiceIntegrationTest {
             UserCommand.Create newUser = new UserCommand.Create(
                     "test",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1));
 
             // act

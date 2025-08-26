@@ -26,11 +26,15 @@ public class PointEntity extends BaseEntity {
     )
     private UserEntity user;
 
-    public PointEntity(UserEntity user) {
+    private PointEntity(UserEntity user) {
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보가 필요합니다.");
         }
         this.user = user;
+    }
+
+    public static PointEntity create(UserEntity user) {
+        return new PointEntity(user);
     }
 
     public void charge(BigDecimal amountToCharge) {

@@ -142,7 +142,7 @@ public class TestDataSetupService {
     private UserEntity createUser(int userSequence) {
         String username = "user" + String.format("%04d", userSequence);
         String email = username + "@test.com";
-        UserGender gender = RANDOM.nextBoolean() ? UserGender.M : UserGender.F;
+        UserGender gender = RANDOM.nextBoolean() ? UserGender.MALE : UserGender.FEMALE;
         LocalDate birth = LocalDate.of(2000, 1, 1);
         return UserEntity.create(username, email, gender, birth);
     }

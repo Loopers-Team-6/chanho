@@ -2,34 +2,19 @@ package com.loopers.domain.user;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.loopers.util.EnumUtils;
 
 public enum UserGender {
-    M("male"),
-    F("female");
-
-    private final String value;
-
-    UserGender(String value) {
-        this.value = value;
-    }
+    MALE,
+    FEMALE;
 
     @JsonValue
     public String getValue() {
-        return value;
+        return name().toLowerCase();
     }
 
     @JsonCreator
     public static UserGender fromValue(String value) {
-        if (value == null) {
-            throw new IllegalArgumentException("Value cannot be null.");
-        }
-
-        for (UserGender userGender : UserGender.values()) {
-            if (userGender.value.equalsIgnoreCase(value)) {
-                return userGender;
-            }
-        }
-
-        throw new IllegalArgumentException(value + " is not a valid value for UserGender.");
+        return EnumUtils.from(UserGender.class, value);
     }
 }

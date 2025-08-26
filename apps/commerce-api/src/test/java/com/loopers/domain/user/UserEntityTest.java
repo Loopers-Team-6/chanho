@@ -30,7 +30,7 @@ public class UserEntityTest {
                     () -> UserEntity.create(
                             invalidUsername,
                             "test@gmail.com",
-                            UserGender.M,
+                            UserGender.MALE,
                             LocalDate.of(2000, 1, 1)));
         }
 
@@ -43,7 +43,7 @@ public class UserEntityTest {
                     () -> UserEntity.create(
                             "mwma91",
                             invalidEmail,
-                            UserGender.M,
+                            UserGender.MALE,
                             LocalDate.of(2000, 1, 1)));
         }
 
@@ -56,7 +56,7 @@ public class UserEntityTest {
                     () -> UserEntity.create(
                             "mwma91",
                             "test@gmail.com",
-                            UserGender.M,
+                            UserGender.MALE,
                             invalidBirthDate));
         }
 

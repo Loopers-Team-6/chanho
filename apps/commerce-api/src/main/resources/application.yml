@@ -23,17 +23,60 @@ spring:
       - redis.yml
       - logging.yml
       - monitoring.yml
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connect-timeout: 1000 # 연결 타임아웃 (ms)
+            read-timeout: 3000 # 읽기 타임아웃 (ms)
+          pg-client:
+            connect-timeout: 1000
+            read-timeout: 6000
 
 springdoc:
   use-fqn: true
   swagger-ui:
     path: /swagger-ui.html
 
+resilience4j:
+  # --- 재시도 설정 ---
+  retry:
+    instances:
+      pg-api: # 설정 이름
+        max-attempts: 3 # 최대 3번 시도
+        wait-duration: 500ms # 시도 간 0.5초 대기
+        enable-exponential-backoff: true # 지수 백오프 활성화
+        exponential-backoff-multiplier: 2 # 지수 백오프 배수 (2배씩 증가)
+        retry-exceptions: # 이 예외가 발생했을 때만 재시도
+          - java.util.concurrent.TimeoutException # 타임아웃 예외
+          - feign.RetryableException # 네트워크 오류나 5xx 서버 오류 등
+          - feign.FeignException.FeignServerException # 50x Server Error
+        ignore-exceptions: # 이 예외는 재시도하지 않음 (클라이언트 오류)
+          - feign.FeignException.FeignClientException # 40x Client Error
+  # --- 서킷 브레이커 설정 ---
+  circuitbreaker:
+    instances:
+      pg-api: # 설정 이름
+        sliding-window-type: count-based # 최근 호출 횟수 기반으로 통계
+        sliding-window-size: 10 # 최근 10번의 호출을 기준으로
+        failure-rate-threshold: 50 # 그 중 50% 이상 실패하면 서킷을 연다(OPEN)
+        wait-duration-in-open-state: 10s # 10초간 OPEN 상태 유지
+        record-exceptions: # 실패로 간주할 예외 목록
+          - feign.RetryableException
+          - java.util.concurrent.TimeoutException
+          - java.net.SocketTimeoutException
+
 ---
 spring:
   config:
     activate:
       on-profile: local, test
+pg:
+  simulator:
+    url: http://localhost:8082
+    callbackUrl: http://localhost:8080/api/v1/payments/callback
+  user-id: 1
 
 ---
 spring:

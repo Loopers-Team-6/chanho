@@ -110,11 +110,4 @@ public class OrderEntity extends BaseEntity {
 
         this.finalPrice = originalPrice.subtract(discountAmount);
     }
-
-    enum OrderStatus {
-        PENDING,
-        COMPLETED,
-        CANCELLED,
-        FAILED;
-    }
 }

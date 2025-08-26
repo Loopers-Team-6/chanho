@@ -2,16 +2,19 @@ package com.loopers.application.order;
 
 import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponService;
-import com.loopers.domain.order.OrderCommand;
 import com.loopers.domain.order.OrderEntity;
-import com.loopers.domain.order.OrderInfo;
+import com.loopers.domain.order.OrderPlacedEvent;
 import com.loopers.domain.order.OrderService;
-import com.loopers.domain.point.PointService;
+import com.loopers.domain.payment.PaymentEntity;
+import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserService;
+import com.loopers.support.error.CoreException;
+import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -25,11 +28,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OrderFacade {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final UserService userService;
     private final OrderService orderService;
     private final ProductService productService;
-    private final PointService pointService;
     private final CouponService couponService;
+    private final PaymentService paymentService;
 
     @Retryable(
             retryFor = {ObjectOptimisticLockingFailureException.class},
@@ -53,15 +57,13 @@ public class OrderFacade {
         // 3. 쿠폰 적용 로직
         applyCoupon(order, command.couponId());
 
-        // 4. 최종 가격으로 포인트 차감
-        BigDecimal finalPrice = order.getFinalPrice();
-        pointService.deductPoints(user.getId(), finalPrice);
-
-        // 5. 주문 완료
-        order.complete();
+        // 4. 주문 상태 업데이트
         OrderEntity saved = orderService.save(order);
 
-        return OrderInfo.from(saved);
+        // 5. 주문생성 이벤트 발행
+        eventPublisher.publishEvent(new OrderPlacedEvent(saved.getId(), command.paymentMethod(), saved.getFinalPrice()));
+
+        return OrderInfo.from(saved, command.paymentMethod());
     }
 
     private List<OrderItemInfo> prepareAndDecreaseStocks(List<OrderCommand.OrderItemDetail> items) {
@@ -94,5 +96,19 @@ public class OrderFacade {
         coupon.use();
         couponService.save(coupon);
         order.applyDiscount(coupon.getId(), discountAmount);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderInfo getOrder(OrderCommand.Find find) {
+        UserEntity user = userService.findById(find.userId());
+        OrderEntity order = orderService.findById(find.orderId());
+
+        if (!order.getUser().getId().equals(user.getId())) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "해당 주문은 사용자의 주문이 아닙니다.");
+        }
+
+        PaymentEntity payment = paymentService.findByOrderId(order.getId());
+
+        return OrderInfo.from(order, payment.getMethod());
     }
 }

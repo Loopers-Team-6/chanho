@@ -81,7 +81,7 @@ class UserV1ApiE2ETest {
                     () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                     () -> assertThat(response.getBody()).isNotNull(),
                     () -> assertThat(response.getBody().data().username()).isEqualTo("mwma91"),
-                    () -> assertThat(response.getBody().data().gender()).isEqualTo(UserGender.M)
+                    () -> assertThat(response.getBody().data().gender()).isEqualTo(UserGender.MALE)
             );
         }
 
@@ -121,7 +121,7 @@ class UserV1ApiE2ETest {
             UserV1Dto.UserResponse created = userFacade.signUp(new UserV1Dto.SignupRequest(
                     "mwma91",
                     "test@gmail.com",
-                    UserGender.M,
+                    UserGender.MALE,
                     LocalDate.of(2000, 1, 1))
             );
 

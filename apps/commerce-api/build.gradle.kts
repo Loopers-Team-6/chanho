@@ -11,6 +11,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${project.properties["springDocOpenApiVersion"]}")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+    implementation("io.github.resilience4j:resilience4j-spring-boot3")
+    implementation("org.springframework.retry:spring-retry:2.0.12")
+    implementation("org.springframework.cloud:spring-cloud-starter-contract-stub-runner")
 
     // querydsl
     annotationProcessor("com.querydsl:querydsl-apt::jakarta")
