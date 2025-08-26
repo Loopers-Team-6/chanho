@@ -1,12 +1,7 @@
 package com.loopers.domain.payment.processor;
 
-import com.loopers.domain.payment.CardPaymentEntity;
-import com.loopers.domain.payment.PaymentEntity;
-import com.loopers.domain.payment.PaymentMethod;
-import com.loopers.infrastructure.payment.PgClient;
+import com.loopers.domain.payment.*;
 import com.loopers.interfaces.api.payment.CardType;
-import com.loopers.interfaces.api.payment.PaymentV1Dto;
-import com.loopers.interfaces.api.payment.TransactionStatus;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -21,13 +16,10 @@ import java.math.BigDecimal;
 @Slf4j
 public class CardPaymentProcessor implements PaymentProcessor {
 
-    private final PgClient pgClient;
+    private final CardPaymentClient cardPaymentClient;
 
     @Value("${pg.simulator.callbackUrl}")
     private String callbackUrl;
-
-    @Value("${pg.user-id}")
-    private long pgUserId;
 
     @Override
     public PaymentMethod getPaymentMethod() {
@@ -43,40 +35,48 @@ public class CardPaymentProcessor implements PaymentProcessor {
     @CircuitBreaker(name = "pg-api", fallbackMethod = "fallbackForCircuitBreaker")
     @Retry(name = "pg-api", fallbackMethod = "fallbackForRetry")
     public void processPayment(PaymentEntity payment) {
-        PaymentV1Dto.OrderResponse paymentsByOrderId = pgClient.findPaymentsByOrderId(pgUserId, payment.getOrderId());
-        if (paymentsByOrderId.meta().isSuccess()) {
-            log.info("이미 결제 요청된 주문입니다. orderId: [{}]", payment.getOrderId());
-            PaymentV1Dto.TransactionInfo transactionInfo = paymentsByOrderId.data().transactions().getLast();
-            updatePayment(payment, transactionInfo.transactionKey(), transactionInfo.status());
-            return;
-        }
+        // 1. CardPaymentClient를 통해 기존 결제 내역 조회
+        cardPaymentClient.findPaymentsByOrderId(payment.getOrderId()).ifPresentOrElse(
+                // 2. 기존 결제 내역이 있을 경우
+                existingPayment -> {
+                    log.info("이미 결제 요청된 주문입니다. orderId: [{}]", payment.getOrderId());
+                    CardPaymentClient.TransactionInfo lastTransaction = existingPayment.transactions().getLast();
+                    updatePayment(payment, lastTransaction.transactionKey(), lastTransaction.status());
+                },
+                // 3. 기존 결제 내역이 없을 경우 (신규 요청)
+                () -> {
+                    log.info("결제 요청 내역이 아직 없습니다. 신규 결제를 요청합니다. orderId: [{}]", payment.getOrderId());
+                    var request = new CardPaymentClient.PaymentRequest(
+                            payment.getOrderId(),
+                            payment.getAmount(),
+                            CardType.SAMSUNG,
+                            "1234-5678-9012-3456",
+                            callbackUrl
+                    );
 
-        log.info("결제 요청 내역이 아직 없습니다. 신규 결제를 요청합니다. orderId: [{}]", payment.getOrderId());
-        PaymentV1Dto.Request request = PaymentV1Dto.Request.create(
-                payment.getOrderId(),
-                CardType.KB,
-                "1234-5678-9012-3456",
-                payment.getAmount().toPlainString(),
-                callbackUrl
+                    cardPaymentClient.requestPayment(request)
+                            .ifPresentOrElse(
+                                    response -> {
+                                        log.info("PG 결제 요청 성공: orderId: {}", payment.getOrderId());
+                                        updatePayment(payment, response.transactionKey(), response.status());
+                                    },
+                                    () -> {
+                                        throw new IllegalStateException("PG 결제 요청 실패");
+                                    }
+                            );
+                }
         );
-        PaymentV1Dto.TransactionResponse response = pgClient.createPaymentRequest(pgUserId, request);
-
-        if (response.isFail()) {
-            throw new IllegalStateException("PG 결제 요청 실패: " + response.meta().message());
-        }
-
-        log.info("PG 결제 요청 성공: orderId: {}", payment.getOrderId());
-        updatePayment(payment, response.data().transactionKey(), response.data().status());
     }
 
-    private void updatePayment(PaymentEntity payment, String transactionKey, TransactionStatus status) {
+    private void updatePayment(PaymentEntity payment, String transactionKey, PaymentStatus status) {
         CardPaymentEntity cardPayment = (CardPaymentEntity) payment;
         cardPayment.setTransactionKey(transactionKey);
 
         switch (status) {
+            case PENDING -> payment.markAsPending();
             case SUCCESS -> payment.markAsSuccess();
             case FAILED -> payment.markAsFailed();
-            case PENDING -> payment.markAsPending();
+            case CANCELED -> payment.markAsCanceled();
             default -> throw new IllegalStateException("알 수 없는 결제 상태: " + status);
         }
         log.info("결제 상태 업데이트: orderId: {}, status: {}", payment.getOrderId(), payment.getStatus());

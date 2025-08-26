@@ -123,6 +123,10 @@ public class PaymentV1Dto {
             Data data
     ) {
 
+        public boolean isFail() {
+            return meta.isFail();
+        }
+
         public record Data(
                 String orderId,
                 List<TransactionInfo> transactions
