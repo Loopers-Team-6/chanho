@@ -1,7 +1,7 @@
 package com.loopers.domain.payment.processor;
 
 import com.loopers.domain.payment.*;
-import com.loopers.interfaces.api.payment.CardType;
+import com.loopers.infrastructure.payment.CardType;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;

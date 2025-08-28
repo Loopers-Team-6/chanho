@@ -1,4 +1,4 @@
-package com.loopers.interfaces.api.payment;
+package com.loopers.infrastructure.payment;
 
 public enum CardType {
     SAMSUNG,

@@ -1,6 +1,6 @@
 package com.loopers.domain.payment;
 
-import com.loopers.interfaces.api.payment.CardType;
+import com.loopers.infrastructure.payment.CardType;
 
 import java.math.BigDecimal;
 import java.util.List;

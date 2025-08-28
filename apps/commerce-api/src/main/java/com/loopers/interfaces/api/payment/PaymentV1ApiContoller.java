@@ -21,7 +21,7 @@ public class PaymentV1ApiContoller implements PaymentV1ApiSpec {
     @Override
     public void paymentCallback(@RequestBody PaymentV1Dto.CallbackTransactionInfo transactionInfo) {
         log.info("결제 콜백 수신: {}", transactionInfo);
-        PaymentCommand.Update command = PaymentCommand.Update.create(transactionInfo.status(), transactionInfo.transactionKey());
+        PaymentCommand.Update command = PaymentCommand.Update.create(transactionInfo.getPaymentStatus(), transactionInfo.transactionKey());
         paymentService.confirmPayment(command);
     }
 }

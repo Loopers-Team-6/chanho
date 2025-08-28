@@ -2,7 +2,6 @@ package com.loopers.domain.payment;
 
 import com.loopers.application.payment.PaymentCommand;
 import com.loopers.domain.payment.processor.PaymentProcessor;
-import com.loopers.interfaces.api.payment.TransactionStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -65,7 +64,7 @@ public class PaymentService {
         if (command == null) {
             throw new IllegalArgumentException("Invalid payment command");
         }
-        if (command.status() == TransactionStatus.PENDING) {
+        if (command.status() == PaymentStatus.PENDING) {
             return;
         }
 
