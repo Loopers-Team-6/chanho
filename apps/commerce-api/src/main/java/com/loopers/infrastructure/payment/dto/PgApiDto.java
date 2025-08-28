@@ -1,5 +1,6 @@
 package com.loopers.infrastructure.payment.dto;
 
+import com.loopers.domain.payment.CardPaymentClient;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.infrastructure.payment.CardType;
 
@@ -31,14 +32,14 @@ public class PgApiDto {
             String amount,
             String callbackUrl
     ) {
-        public static Request create(
-                Long orderId,
-                CardType cardType,
-                String cardNo,
-                String amount,
-                String callbackUrl
-        ) {
-            return new Request(orderId, cardType, cardNo, amount, callbackUrl);
+        public static Request of(CardPaymentClient.PaymentRequest request) {
+            return new Request(
+                    request.orderId(),
+                    request.cardType(),
+                    request.cardNo(),
+                    request.amount().toPlainString(),
+                    request.callbackUrl()
+            );
         }
 
         public Request {

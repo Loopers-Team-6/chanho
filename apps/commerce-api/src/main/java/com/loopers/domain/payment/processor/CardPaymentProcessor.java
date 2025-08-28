@@ -2,8 +2,6 @@ package com.loopers.domain.payment.processor;
 
 import com.loopers.domain.payment.*;
 import com.loopers.infrastructure.payment.CardType;
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,8 +30,6 @@ public class CardPaymentProcessor implements PaymentProcessor {
     }
 
     @Override
-    @CircuitBreaker(name = "pg-api", fallbackMethod = "fallbackForCircuitBreaker")
-    @Retry(name = "pg-api", fallbackMethod = "fallbackForRetry")
     public void processPayment(PaymentEntity payment) {
         // 1. CardPaymentClient를 통해 기존 결제 내역 조회
         cardPaymentClient.findPaymentsByOrderId(payment.getOrderId()).ifPresentOrElse(
@@ -81,17 +77,4 @@ public class CardPaymentProcessor implements PaymentProcessor {
         }
         log.info("결제 상태 업데이트: orderId: {}, status: {}", payment.getOrderId(), payment.getStatus());
     }
-
-    private void fallbackForRetry(PaymentEntity payment, Throwable t) {
-        log.info("이것은 retry fallback입니다. orderId: {}, error: {}", payment.getOrderId(), t.getMessage());
-    }
-
-    private void fallbackForCircuitBreaker(PaymentEntity payment, Throwable t) {
-        log.info("이것은 circuit breaker fallback입니다. orderId: {}, error: {}", payment.getOrderId(), t.getMessage());
-    }
-
-//    private void processPaymentFallback(PaymentEntity payment, Throwable t) {
-//        log.error("PG 결제 요청 최종 실패. Fallback 실행. orderId: {}, error: {}", payment.getOrderId(), t.getMessage());
-//        payment.fail();
-//    }
 }
