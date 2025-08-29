@@ -29,10 +29,11 @@ public class CardPaymentEntity extends PaymentEntity {
         return new CardPaymentEntity(orderId, amount, transactionId);
     }
 
-    public void setTransactionKey(String transactionKey) {
+    public void updateTransactionInfo(String transactionKey, PaymentStatus status) {
         if (transactionKey == null || transactionKey.isBlank()) {
             throw new IllegalArgumentException("트랜잭션 키가 올바르지 않습니다.");
         }
         this.transactionKey = transactionKey;
+        updatePaymentStatus(status);
     }
 }

@@ -20,7 +20,7 @@ public interface PgClient {
     );
 
     @GetMapping("/api/v1/payments")
-    PgApiDto.OrderResponse findPaymentsByOrderId(
+    PgApiDto.OrderResponse findTransactionsByOrderId(
             @RequestHeader("X-USER-ID") Long userId,
             @RequestParam("orderId") Long orderId
     );

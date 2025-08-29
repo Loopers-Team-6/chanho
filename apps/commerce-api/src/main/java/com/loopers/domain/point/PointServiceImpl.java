@@ -23,16 +23,16 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
-    public PointEntity findByUserId(Long id) {
-        return pointRepository.findByUserId(id)
-                .orElseThrow(() -> new EntityNotFoundException("사용자의 포인트 정보가 존재하지 않습니다: " + id));
+    public PointEntity findByUserId(Long userId) {
+        return pointRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("사용자의 포인트 정보가 존재하지 않습니다: " + userId));
     }
 
     @Override
-    public void deductPoints(Long userId, BigDecimal points) {
+    public void deductPoints(Long userId, BigDecimal amount) {
         PointEntity point = findByUserIdWithPessimisticLock(userId);
 
-        point.use(points);
+        point.use(amount);
         pointRepository.save(point);
     }
 

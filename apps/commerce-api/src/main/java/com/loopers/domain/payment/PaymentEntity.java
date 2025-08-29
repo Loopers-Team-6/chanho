@@ -54,22 +54,22 @@ public abstract class PaymentEntity extends BaseEntity {
     }
 
     public void markAsPending() {
-        changePaymentStatus(PaymentStatus.PENDING);
+        updatePaymentStatus(PaymentStatus.PENDING);
     }
 
     public void markAsSuccess() {
-        changePaymentStatus(PaymentStatus.SUCCESS);
+        updatePaymentStatus(PaymentStatus.SUCCESS);
     }
 
     public void markAsFailed() {
-        changePaymentStatus(PaymentStatus.FAILED);
+        updatePaymentStatus(PaymentStatus.FAILED);
     }
 
     public void markAsCanceled() {
-        changePaymentStatus(PaymentStatus.CANCELED);
+        updatePaymentStatus(PaymentStatus.CANCELED);
     }
 
-    private void changePaymentStatus(PaymentStatus newStatus) {
+    public void updatePaymentStatus(PaymentStatus newStatus) {
         if (this.status == newStatus) {
             return;
         }

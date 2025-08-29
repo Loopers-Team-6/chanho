@@ -28,7 +28,8 @@ public class PaymentService {
     public PaymentService(
             ApplicationEventPublisher eventPublisher,
             List<PaymentProcessor> paymentProcessors,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository
+    ) {
         this.eventPublisher = eventPublisher;
         this.paymentProcessors = paymentProcessors.stream()
                 .collect(Collectors.toUnmodifiableMap(PaymentProcessor::getPaymentMethod, Function.identity()));
@@ -43,8 +44,6 @@ public class PaymentService {
             PaymentEntity payment = paymentRepository.save(paymentProcessor.createPayment(orderId, amount));
             paymentProcessor.processPayment(payment);
             paymentRepository.save(payment);
-
-            eventPublisher.publishEvent(new PaymentProcessedEvent(orderId, payment.getId(), payment.getStatus()));
         } catch (DataIntegrityViolationException e) {
             log.warn("결제 요청 중복 발생 Order ID: [{}], Payment Method: [{}]", orderId, paymentMethod);
         }
@@ -56,7 +55,7 @@ public class PaymentService {
         paymentProcessor.processPayment(payment);
         paymentRepository.save(payment);
 
-        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getStatus()));
     }
 
     @Transactional
@@ -75,7 +74,7 @@ public class PaymentService {
         }
 
         paymentRepository.save(payment);
-        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getStatus()));
     }
 
     public List<PaymentEntity> findPaymentsToRetry(ZonedDateTime threshold) {

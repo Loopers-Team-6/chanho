@@ -28,7 +28,7 @@ public class PgClientAdapter implements CardPaymentClient {
     @Override
     @CircuitBreaker(name = "pg-api-request", fallbackMethod = "requestPaymentFallback")
     @Retry(name = "pg-api-request")
-    public Optional<PaymentResponse> requestPayment(PaymentRequest request) {
+    public Optional<TransactionInfo> requestPayment(PaymentRequest request) {
         PgApiDto.Request pgRequest = PgApiDto.Request.of(request);
 
         try {
@@ -38,7 +38,7 @@ public class PgClientAdapter implements CardPaymentClient {
                 return Optional.empty();
             }
 
-            return Optional.of(new PaymentResponse(
+            return Optional.of(new TransactionInfo(
                     response.data().transactionKey(),
                     response.data().status().toPaymentStatus()
             ));
@@ -54,9 +54,9 @@ public class PgClientAdapter implements CardPaymentClient {
     @Override
     @CircuitBreaker(name = "pg-api-find", fallbackMethod = "findPaymentsByOrderIdFallback")
     @Retry(name = "pg-api-find")
-    public Optional<FindPaymentsResponse> findPaymentsByOrderId(Long orderId) {
+    public Optional<FindPaymentsResponse> findTransactionsByOrderId(Long orderId) {
         try {
-            PgApiDto.OrderResponse response = pgClient.findPaymentsByOrderId(pgUserId, orderId);
+            PgApiDto.OrderResponse response = pgClient.findTransactionsByOrderId(pgUserId, orderId);
             if (response.isFail() || response.data() == null) {
                 return Optional.empty();
             }
@@ -65,7 +65,7 @@ public class PgClientAdapter implements CardPaymentClient {
                     .map(tx -> new TransactionInfo(tx.transactionKey(), tx.status().toPaymentStatus()))
                     .toList();
 
-            return Optional.of(new FindPaymentsResponse(response.data().orderId(), domainTransactions));
+            return Optional.of(new FindPaymentsResponse(orderId, domainTransactions));
         } catch (FeignException e) {
             log.error("주문 ID로 결제 내역 조회 중 FeignException 발생. orderId: {}, status: {}", orderId, e.status());
             if (e instanceof feign.RetryableException || e.status() >= 500) {
@@ -75,14 +75,14 @@ public class PgClientAdapter implements CardPaymentClient {
         }
     }
 
-    private Optional<PaymentResponse> requestPaymentFallback(PaymentRequest request, Throwable t) {
-        log.warn("CircuitBreaker is open for requestPayment. orderId: {}, rootCause: {}",
+    private Optional<TransactionInfo> requestPaymentFallback(PaymentRequest request, Throwable t) {
+        log.warn("requestPayment 실패로 인한 써킷브레이커 실행. orderId: {}, rootCause: {}",
                 request.orderId(), t.getClass().getSimpleName());
         return Optional.empty();
     }
 
-    private Optional<PaymentResponse> findPaymentsByOrderIdFallback(Long orderId, Throwable t) {
-        log.warn("CircuitBreaker is open for findPaymentsByOrderId. orderId: {}, rootCause: {}",
+    private Optional<FindPaymentsResponse> findPaymentsByOrderIdFallback(Long orderId, Throwable t) {
+        log.warn("findPaymentsByOrderId 실패로 인한 써킷브레이커 실행. orderId: {}, rootCause: {}",
                 orderId, t.getClass().getSimpleName());
         return Optional.empty();
     }

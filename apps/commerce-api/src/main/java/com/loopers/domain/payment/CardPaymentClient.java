@@ -8,6 +8,10 @@ import java.util.Optional;
 
 public interface CardPaymentClient {
 
+    Optional<TransactionInfo> requestPayment(PaymentRequest request);
+
+    Optional<FindPaymentsResponse> findTransactionsByOrderId(Long orderId);
+
     record PaymentRequest(
             Long orderId,
             BigDecimal amount,
@@ -17,14 +21,6 @@ public interface CardPaymentClient {
     ) {
     }
 
-    record PaymentResponse(
-            String transactionKey,
-            PaymentStatus status
-    ) {
-    }
-
-    Optional<PaymentResponse> requestPayment(PaymentRequest request);
-
     record TransactionInfo(
             String transactionKey,
             PaymentStatus status
@@ -32,10 +28,8 @@ public interface CardPaymentClient {
     }
 
     record FindPaymentsResponse(
-            String orderId,
+            Long orderId,
             List<TransactionInfo> transactions
     ) {
     }
-
-    Optional<FindPaymentsResponse> findPaymentsByOrderId(Long orderId);
 }

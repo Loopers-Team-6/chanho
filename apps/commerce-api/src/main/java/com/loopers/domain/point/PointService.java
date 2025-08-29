@@ -6,9 +6,9 @@ public interface PointService {
 
     PointEntity save(PointEntity point);
 
-    PointEntity findByUserId(Long id);
+    PointEntity findByUserId(Long userId);
 
-    void deductPoints(Long id, BigDecimal totalPrice);
+    void deductPoints(Long userId, BigDecimal amount);
 
     PointEntity findByUserIdWithPessimisticLock(long userId);
 }
