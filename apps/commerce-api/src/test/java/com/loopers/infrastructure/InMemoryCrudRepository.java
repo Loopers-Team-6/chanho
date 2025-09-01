@@ -79,4 +79,13 @@ public abstract class InMemoryCrudRepository<T extends BaseEntity> implements Cu
                 .map(this::save)
                 .toList();
     }
+
+    @Override
+    public T getReferenceById(Long id) {
+        T entity = map.get(id);
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity with ID " + id + " not found");
+        }
+        return entity;
+    }
 }

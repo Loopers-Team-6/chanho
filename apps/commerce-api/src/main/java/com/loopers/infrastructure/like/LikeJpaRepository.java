@@ -11,7 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface LikeJpaRepository extends JpaRepository<LikeEntity, Long> {
-    long countByProductId(Long productId);
+    @Query("SELECT count(l) FROM LikeEntity l WHERE l.product.id = :productId AND l.deletedAt IS NULL")
+    long countByProductId(@Param("productId") Long productId);
 
     @Query("SELECT new com.loopers.domain.like.LikeCountDto(l.product.id, COUNT(l.id)) " +
             "FROM LikeEntity l " +
