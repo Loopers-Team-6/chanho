@@ -66,6 +66,13 @@ public class ProductEntity extends BaseEntity {
         this.stock -= quantityToReduce;
     }
 
+    public void increaseStock(int quantityToIncrease) {
+        if (quantityToIncrease <= 0) {
+            throw new IllegalArgumentException("증가할 수량은 0보다 커야 합니다.");
+        }
+        this.stock += quantityToIncrease;
+    }
+
     public void increaseLikeCount() {
         this.likeCount++;
     }

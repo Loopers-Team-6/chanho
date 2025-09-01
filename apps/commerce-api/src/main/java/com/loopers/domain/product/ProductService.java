@@ -1,7 +1,10 @@
 package com.loopers.domain.product;
 
+import com.loopers.domain.order.OrderEntity;
+import com.loopers.domain.order.OrderRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -11,9 +14,11 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final OrderRepository orderRepository;
 
     public ProductEntity findById(Long id) {
         if (id == null) {
@@ -47,8 +52,17 @@ public class ProductService {
     }
 
     @Transactional
-    public void decreaseStocks(List<ProductCommand.StockDecrease> commands) {
+    public void decreaseStocks(Long orderId, List<ProductCommand.StockDecrease> commands) {
         if (commands == null || commands.isEmpty()) {
+            return;
+        }
+
+        OrderEntity order = orderRepository.findByIdWithPessimisticLock(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 주문을 찾을 수 없습니다: " + orderId));
+
+        if (order.isStockDeducted() || !order.isPending()) {
+            log.warn("이미 재고가 차감되었거나 주문이 PENDING 상태가 아니므로 재고 차감을 건너뜁니다. status={}, stockDeducted={}",
+                    order.getStatus(), order.isStockDeducted());
             return;
         }
 
@@ -58,5 +72,8 @@ public class ProductService {
 
             product.decreaseStock(command.quantity());
         }
+
+        order.markStockAsDeducted();
+        orderRepository.save(order);
     }
 }

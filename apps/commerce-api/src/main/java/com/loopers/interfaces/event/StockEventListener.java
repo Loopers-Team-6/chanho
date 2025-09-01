@@ -24,6 +24,6 @@ public class StockEventListener {
                 .map(item -> new ProductCommand.StockDecrease(item.productId(), item.quantity()))
                 .toList();
 
-        productService.decreaseStocks(decreaseCommands);
+        productService.decreaseStocks(event.orderId(), decreaseCommands);
     }
 }
