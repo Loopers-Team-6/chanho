@@ -95,6 +95,7 @@ public class OrderFacade {
         BigDecimal discountAmount = coupon.getDiscountAmount(originalPrice);
 
         coupon.use();
+        coupon.applyToOrder(order.getId());
         couponService.save(coupon);
         order.applyDiscount(coupon.getId(), discountAmount);
     }
