@@ -1,6 +1,6 @@
 package com.loopers.interfaces.event;
 
-import com.loopers.domain.order.OrderPlacedEvent;
+import com.loopers.domain.order.event.OrderPlacedEvent;
 import com.loopers.domain.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;

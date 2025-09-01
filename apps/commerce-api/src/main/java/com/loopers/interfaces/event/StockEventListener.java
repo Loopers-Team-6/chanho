@@ -1,6 +1,7 @@
 package com.loopers.interfaces.event;
 
-import com.loopers.domain.order.OrderPlacedEvent;
+import com.loopers.domain.order.event.OrderFailedEvent;
+import com.loopers.domain.order.event.OrderPlacedEvent;
 import com.loopers.domain.product.ProductCommand;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -25,5 +26,11 @@ public class StockEventListener {
                 .toList();
 
         productService.decreaseStocks(event.orderId(), decreaseCommands);
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleOrderFailedEvent(OrderFailedEvent event) {
+        productService.restoreStocks(event.orderId());
     }
 }

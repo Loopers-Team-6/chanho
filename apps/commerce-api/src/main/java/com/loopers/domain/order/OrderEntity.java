@@ -89,7 +89,7 @@ public class OrderEntity extends BaseEntity {
         if (status != OrderStatus.PENDING) {
             throw new IllegalStateException("오직 대기 중인 주문만 취소할 수 있습니다.");
         }
-        status = OrderStatus.CANCELLED;
+        status = OrderStatus.CANCELED;
     }
 
     public void fail() {

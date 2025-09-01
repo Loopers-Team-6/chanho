@@ -76,4 +76,26 @@ public class ProductService {
         order.markStockAsDeducted();
         orderRepository.save(order);
     }
+
+    public void restoreStocks(Long orderId) {
+        log.info("재고 복원 시작: orderId={}", orderId);
+
+        OrderEntity order = orderRepository.findByIdWithPessimisticLock(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("주문을 찾을 수 없습니다."));
+
+        if (!order.isStockDeducted()) {
+            log.info("재고가 차감된 기록이 없어 복원을 건너뜁니다: orderId={}", orderId);
+            return;
+        }
+
+        order.getItems().forEach(item -> {
+            ProductEntity product = productRepository.findByIdWithPessimisticLock(item.getProductId())
+                    .orElseThrow(() -> new EntityNotFoundException("해당 ID의 상품을 찾을 수 없습니다: " + item.getProductId()));
+            product.increaseStock(item.getQuantity());
+        });
+
+        order.markStockAsRestored();
+        orderRepository.save(order);
+        log.info("재고 복원 완료: orderId={}", orderId);
+    }
 }
