@@ -1,4 +1,4 @@
-package com.loopers.interfaces.listener;
+package com.loopers.interfaces.event;
 
 import com.loopers.domain.payment.CardPaymentResponseEvent;
 import com.loopers.domain.payment.CardPaymentService;

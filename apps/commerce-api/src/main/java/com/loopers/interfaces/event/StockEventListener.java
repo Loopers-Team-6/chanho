@@ -1,22 +1,29 @@
-package com.loopers.interfaces.listener;
+package com.loopers.interfaces.event;
 
 import com.loopers.domain.order.OrderPlacedEvent;
-import com.loopers.domain.payment.PaymentService;
+import com.loopers.domain.product.ProductCommand;
+import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
-public class OrderPlacedEventListener {
+public class StockEventListener {
 
-    private final PaymentService paymentService;
+    private final ProductService productService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleOrderPlacedEvent(OrderPlacedEvent event) {
-        paymentService.requestPayment(event.orderId(), event.paymentMethod(), event.amount());
+        List<ProductCommand.StockDecrease> decreaseCommands = event.items().stream()
+                .map(item -> new ProductCommand.StockDecrease(item.productId(), item.quantity()))
+                .toList();
+
+        productService.decreaseStocks(decreaseCommands);
     }
 }
