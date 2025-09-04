@@ -6,6 +6,8 @@ import com.loopers.domain.user.UserEntity;
 import com.loopers.infrastructure.AbstractRepositoryImpl;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class OrderRepositoryImpl extends AbstractRepositoryImpl<OrderEntity, OrderJpaRepository> implements OrderRepository {
     public OrderRepositoryImpl(OrderJpaRepository jpaRepository) {
@@ -15,5 +17,10 @@ public class OrderRepositoryImpl extends AbstractRepositoryImpl<OrderEntity, Ord
     @Override
     public long countByUser(UserEntity user) {
         return jpaRepository.countByUser(user);
+    }
+
+    @Override
+    public Optional<OrderEntity> findByIdWithPessimisticLock(Long orderId) {
+        return jpaRepository.findByIdWithPessimisticLock(orderId);
     }
 }

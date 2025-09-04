@@ -2,7 +2,6 @@ package com.loopers.domain.payment;
 
 import com.loopers.application.payment.PaymentCommand;
 import com.loopers.domain.payment.processor.PaymentProcessor;
-import com.loopers.interfaces.api.payment.TransactionStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,7 +28,8 @@ public class PaymentService {
     public PaymentService(
             ApplicationEventPublisher eventPublisher,
             List<PaymentProcessor> paymentProcessors,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository
+    ) {
         this.eventPublisher = eventPublisher;
         this.paymentProcessors = paymentProcessors.stream()
                 .collect(Collectors.toUnmodifiableMap(PaymentProcessor::getPaymentMethod, Function.identity()));
@@ -44,8 +44,6 @@ public class PaymentService {
             PaymentEntity payment = paymentRepository.save(paymentProcessor.createPayment(orderId, amount));
             paymentProcessor.processPayment(payment);
             paymentRepository.save(payment);
-
-            eventPublisher.publishEvent(new PaymentProcessedEvent(orderId, payment.getId(), payment.getStatus()));
         } catch (DataIntegrityViolationException e) {
             log.warn("결제 요청 중복 발생 Order ID: [{}], Payment Method: [{}]", orderId, paymentMethod);
         }
@@ -57,7 +55,7 @@ public class PaymentService {
         paymentProcessor.processPayment(payment);
         paymentRepository.save(payment);
 
-        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getStatus()));
     }
 
     @Transactional
@@ -65,7 +63,7 @@ public class PaymentService {
         if (command == null) {
             throw new IllegalArgumentException("Invalid payment command");
         }
-        if (command.status() == TransactionStatus.PENDING) {
+        if (command.status() == PaymentStatus.PENDING) {
             return;
         }
 
@@ -76,7 +74,7 @@ public class PaymentService {
         }
 
         paymentRepository.save(payment);
-        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getId(), payment.getStatus()));
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getStatus()));
     }
 
     public List<PaymentEntity> findPaymentsToRetry(ZonedDateTime threshold) {

@@ -32,11 +32,11 @@ public class CouponEntity extends BaseEntity {
     @Column(name = "is_used", nullable = false)
     private boolean isUsed = false;
 
+    @Column(name = "order_id")
+    private Long orderId;
+
     @Embedded
     private DiscountPolicy discountPolicy;
-
-    @Version
-    private Long version;
 
     private CouponEntity(String name, UserEntity owner, DiscountPolicy discountPolicy) {
         Validator.validateName(name);
@@ -73,6 +73,13 @@ public class CouponEntity extends BaseEntity {
         if (!owner.getId().equals(userId)) {
             throw new IllegalArgumentException("쿠폰 소유자와 요청한 사용자의 ID가 일치하지 않습니다.");
         }
+    }
+
+    public void applyToOrder(Long orderId) {
+        if (orderId == null) {
+            throw new IllegalArgumentException("주문 ID는 null일 수 없습니다.");
+        }
+        this.orderId = orderId;
     }
 
     static class Validator {

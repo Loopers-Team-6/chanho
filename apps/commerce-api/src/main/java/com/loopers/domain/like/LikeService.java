@@ -4,8 +4,8 @@ import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,33 +19,43 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public LikeEntity addLike(long userId, long productId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다. userId: " + userId));
-        ProductEntity product = productRepository.findByIdWithPessimisticLock(productId)
-                .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. productId: " + productId));
+        return likeRepository.findByUserIdAndProductId(userId, productId)
+                // 값이 있는 경우 (이미 좋아요를 누른 적이 있음)
+                .map(like -> {
+                    // 삭제된 상태일 때만 복원하고 이벤트를 발행
+                    if (like.isDeleted()) {
+                        like.restore();
+                        likeRepository.save(like);
+                        eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, true));
+                    }
+                    return like;
+                })
+                // 값이 없는 경우 (처음으로 좋아요를 누름)
+                .orElseGet(() -> {
+                    UserEntity userProxy = userRepository.getReferenceById(userId);
+                    ProductEntity productProxy = productRepository.getReferenceById(productId);
+                    LikeEntity newLike = LikeEntity.create(userProxy, productProxy);
 
-        LikeEntity newLike = likeRepository.saveOrFind(LikeEntity.create(user, product));
-
-        product.increaseLikeCount();
-        productRepository.save(product);
-
-        return newLike;
+                    likeRepository.save(newLike);
+                    eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, true));
+                    return newLike;
+                });
     }
 
     @Transactional
     public void removeLike(long userId, long productId) {
         likeRepository.findByUserIdAndProductId(userId, productId)
                 .ifPresent(like -> {
+                    if (like.isDeleted()) {
+                        return;
+                    }
                     like.delete();
                     likeRepository.save(like);
-
-                    ProductEntity product = productRepository.findByIdWithPessimisticLock(productId)
-                            .orElseThrow(() -> new EntityNotFoundException("상품을 찾을 수 없습니다. productId: " + productId));
-                    product.decreaseLikeCount();
-                    productRepository.save(product);
+                    eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, false));
                 });
     }
 

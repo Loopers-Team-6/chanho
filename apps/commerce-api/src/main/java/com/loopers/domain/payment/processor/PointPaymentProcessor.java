@@ -33,7 +33,7 @@ public class PointPaymentProcessor implements PaymentProcessor {
         OrderEntity order = orderService.findById(payment.getOrderId());
 
         Long userId = order.getUser().getId();
-        BigDecimal finalPrice = order.getFinalPrice();
+        BigDecimal finalPrice = payment.getAmount();
 
         try {
             pointService.deductPoints(userId, finalPrice);

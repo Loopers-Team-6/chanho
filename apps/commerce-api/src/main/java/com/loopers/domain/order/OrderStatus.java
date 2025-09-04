@@ -7,7 +7,7 @@ import com.loopers.util.EnumUtils;
 public enum OrderStatus {
     PENDING,
     COMPLETED,
-    CANCELLED,
+    CANCELED,
     FAILED;
 
     @JsonValue

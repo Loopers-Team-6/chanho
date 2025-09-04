@@ -1,12 +1,10 @@
-package com.loopers.application.order;
+package com.loopers.interfaces.event;
 
-import com.loopers.domain.order.OrderPlacedEvent;
+import com.loopers.domain.order.event.OrderPlacedEvent;
 import com.loopers.domain.payment.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
@@ -18,7 +16,6 @@ public class OrderPlacedEventListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void handleOrderPlacedEvent(OrderPlacedEvent event) {
         paymentService.requestPayment(event.orderId(), event.paymentMethod(), event.amount());
     }

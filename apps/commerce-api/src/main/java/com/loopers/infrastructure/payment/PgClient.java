@@ -1,6 +1,6 @@
 package com.loopers.infrastructure.payment;
 
-import com.loopers.interfaces.api.payment.PaymentV1Dto;
+import com.loopers.infrastructure.payment.dto.PgApiDto;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -8,19 +8,19 @@ import org.springframework.web.bind.annotation.*;
 public interface PgClient {
 
     @PostMapping("/api/v1/payments")
-    PaymentV1Dto.TransactionResponse createPaymentRequest(
+    PgApiDto.TransactionResponse createPaymentRequest(
             @RequestHeader("X-USER-ID") Long userId,
-            @RequestBody PaymentV1Dto.Request paymentRequest
+            @RequestBody PgApiDto.Request paymentRequest
     );
 
     @GetMapping("/api/v1/payments/{transactionKey}")
-    PaymentV1Dto.TransactionDetailResponse findPaymentTransactionDetailByKey(
+    PgApiDto.TransactionDetailResponse findPaymentTransactionDetailByKey(
             @RequestHeader("X-USER-ID") Long userId,
             @PathVariable("transactionKey") String transactionKey
     );
 
     @GetMapping("/api/v1/payments")
-    PaymentV1Dto.OrderResponse findPaymentsByOrderId(
+    PgApiDto.OrderResponse findTransactionsByOrderId(
             @RequestHeader("X-USER-ID") Long userId,
             @RequestParam("orderId") Long orderId
     );

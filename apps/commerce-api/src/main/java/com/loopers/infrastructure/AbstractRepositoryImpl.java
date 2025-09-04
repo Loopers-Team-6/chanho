@@ -54,4 +54,9 @@ public abstract class AbstractRepositoryImpl<T extends BaseEntity, R extends Jpa
 
         return jpaRepository.saveAll(entities);
     }
+
+    @Override
+    public T getReferenceById(Long id) {
+        return jpaRepository.getReferenceById(id);
+    }
 }

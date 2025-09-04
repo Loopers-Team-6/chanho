@@ -2,24 +2,20 @@ package com.loopers.application.product;
 
 import com.loopers.application.ProductFacade;
 import com.loopers.domain.brand.BrandEntity;
+import com.loopers.domain.brand.BrandRepository;
 import com.loopers.domain.like.LikeEntity;
 import com.loopers.domain.like.LikeRepository;
-import com.loopers.domain.like.LikeService;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
-import com.loopers.domain.product.ProductService;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserGender;
 import com.loopers.domain.user.UserRepository;
-import com.loopers.infrastructure.like.FakeLikeRepository;
-import com.loopers.infrastructure.product.FakeProductRepository;
-import com.loopers.infrastructure.user.FakeUserRepository;
 import com.loopers.interfaces.api.PageResponse;
 import com.loopers.interfaces.api.product.ProductV1Dto;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import com.loopers.utils.DatabaseCleanUp;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -27,12 +23,21 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 public class ProductFacadeTest {
 
+    @Autowired
     private ProductFacade productFacade;
+    @Autowired
     private ProductRepository productRepository;
+    @Autowired
     private LikeRepository likeRepository;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private BrandRepository brandRepository;
+    @Autowired
+    private DatabaseCleanUp databaseCleanUp;
 
     private UserEntity user1;
     private UserEntity user2;
@@ -41,22 +46,18 @@ public class ProductFacadeTest {
 
     @BeforeEach
     void setUp() {
-        userRepository = new FakeUserRepository();
-        productRepository = new FakeProductRepository();
-        likeRepository = new FakeLikeRepository();
-
-        LikeService likeService = new LikeService(likeRepository, userRepository, productRepository);
-        ProductService productService = new ProductService(productRepository);
-
-        productFacade = new ProductFacade(productService, likeService);
-
         // 테스트 데이터 생성
         user1 = userRepository.save(UserEntity.create("user1", "user1@test.com", UserGender.MALE, LocalDate.now().minusYears(20)));
         user2 = userRepository.save(UserEntity.create("user2", "user2@test.com", UserGender.FEMALE, LocalDate.now().minusYears(30)));
 
-        BrandEntity brand = BrandEntity.create("나이키");
+        BrandEntity brand = brandRepository.save(BrandEntity.create("나이키"));
         product1 = productRepository.save(ProductEntity.create("신발", 130000, 10, brand));
         product2 = productRepository.save(ProductEntity.create("가방", 170000, 5, brand));
+    }
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanUp.truncateAllTables();
     }
 
     @DisplayName("상품 상세 조회 시")

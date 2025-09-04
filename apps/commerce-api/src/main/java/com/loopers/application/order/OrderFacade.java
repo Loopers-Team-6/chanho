@@ -3,8 +3,8 @@ package com.loopers.application.order;
 import com.loopers.domain.coupon.CouponEntity;
 import com.loopers.domain.coupon.CouponService;
 import com.loopers.domain.order.OrderEntity;
-import com.loopers.domain.order.OrderPlacedEvent;
 import com.loopers.domain.order.OrderService;
+import com.loopers.domain.order.event.OrderPlacedEvent;
 import com.loopers.domain.payment.PaymentEntity;
 import com.loopers.domain.payment.PaymentService;
 import com.loopers.domain.product.ProductEntity;
@@ -47,8 +47,8 @@ public class OrderFacade {
         }
         UserEntity user = userService.findById(command.userId());
 
-        // 1. 상품 조회 및 재고 차감
-        List<OrderItemInfo> orderItems = prepareAndDecreaseStocks(command.items());
+        // 1. 상품 조회 및 재고 확인
+        List<OrderItemInfo> orderItems = checkStocks(command.items());
 
         // 2. 주문 생성
         OrderEntity order = orderService.save(OrderEntity.create(user));
@@ -61,17 +61,18 @@ public class OrderFacade {
         OrderEntity saved = orderService.save(order);
 
         // 5. 주문생성 이벤트 발행
-        eventPublisher.publishEvent(new OrderPlacedEvent(saved.getId(), command.paymentMethod(), saved.getFinalPrice()));
+        eventPublisher.publishEvent(new OrderPlacedEvent(saved.getId(), command.paymentMethod(), saved.getFinalPrice(), orderItems));
 
         return OrderInfo.from(saved, command.paymentMethod());
     }
 
-    private List<OrderItemInfo> prepareAndDecreaseStocks(List<OrderCommand.OrderItemDetail> items) {
+    private List<OrderItemInfo> checkStocks(List<OrderCommand.OrderItemDetail> items) {
         return items.stream()
                 .map(item -> {
                     ProductEntity product = productService.findById(item.productId());
-                    product.decreaseStock(item.quantity());
-
+                    if (product.getStock() < item.quantity()) {
+                        throw new IllegalArgumentException("재고가 부족합니다.");
+                    }
                     return new OrderItemInfo(
                             product.getId(),
                             product.getName(),
@@ -94,6 +95,7 @@ public class OrderFacade {
         BigDecimal discountAmount = coupon.getDiscountAmount(originalPrice);
 
         coupon.use();
+        coupon.applyToOrder(order.getId());
         couponService.save(coupon);
         order.applyDiscount(coupon.getId(), discountAmount);
     }

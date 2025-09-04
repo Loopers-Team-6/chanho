@@ -42,6 +42,9 @@ public class OrderEntity extends BaseEntity {
     @Column(name = "applied_coupon_id")
     private Long appliedCouponId = null;
 
+    @Column(name = "stock_deducted", nullable = false)
+    private boolean stockDeducted = false;
+
     private OrderEntity(UserEntity user) {
         this.user = user;
     }
@@ -86,7 +89,7 @@ public class OrderEntity extends BaseEntity {
         if (status != OrderStatus.PENDING) {
             throw new IllegalStateException("오직 대기 중인 주문만 취소할 수 있습니다.");
         }
-        status = OrderStatus.CANCELLED;
+        status = OrderStatus.CANCELED;
     }
 
     public void fail() {
@@ -109,5 +112,21 @@ public class OrderEntity extends BaseEntity {
         }
 
         this.finalPrice = originalPrice.subtract(discountAmount);
+    }
+
+    public boolean isPending() {
+        return this.status == OrderStatus.PENDING;
+    }
+
+    public void markStockAsDeducted() {
+        if (!this.stockDeducted) {
+            this.stockDeducted = true;
+        }
+    }
+
+    public void markStockAsRestored() {
+        if (this.stockDeducted) {
+            this.stockDeducted = false;
+        }
     }
 }
