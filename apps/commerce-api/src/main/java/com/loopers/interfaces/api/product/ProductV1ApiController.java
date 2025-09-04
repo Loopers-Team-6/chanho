@@ -39,4 +39,26 @@ public class ProductV1ApiController implements ProductV1ApiSpec {
         }
         return ApiResponse.success(productFacade.getProducts(pageable, Long.valueOf(userId)));
     }
+
+    @Override
+    public ApiResponse<Object> addLike(Long productId, HttpServletRequest request) {
+        String userId = request.getHeader("X-USER-ID");
+        if (userId == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "X-USER-ID header is required.");
+        }
+        productFacade.addLike(userId, productId);
+
+        return ApiResponse.success();
+    }
+
+    @Override
+    public ApiResponse<Object> removeLike(Long productId, HttpServletRequest request) {
+        String userId = request.getHeader("X-USER-ID");
+        if (userId == null) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "X-USER-ID header is required.");
+        }
+        productFacade.removeLike(userId, productId);
+
+        return ApiResponse.success();
+    }
 }

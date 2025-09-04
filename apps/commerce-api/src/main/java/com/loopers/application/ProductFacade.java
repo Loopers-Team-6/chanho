@@ -52,4 +52,12 @@ public class ProductFacade {
                 })
         );
     }
+
+    public void addLike(String userId, Long productId) {
+        likeService.addLike(Long.parseLong(userId), productId);
+    }
+
+    public void removeLike(String userId, Long productId) {
+        likeService.removeLike(Long.parseLong(userId), productId);
+    }
 }
