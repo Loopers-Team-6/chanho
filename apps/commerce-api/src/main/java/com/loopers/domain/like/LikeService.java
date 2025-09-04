@@ -23,27 +23,27 @@ public class LikeService {
 
     @Transactional
     public LikeEntity addLike(long userId, long productId) {
-        return likeRepository.findByUserIdAndProductId(userId, productId)
+        LikeEntity like = likeRepository.findByUserIdAndProductId(userId, productId)
                 // 값이 있는 경우 (이미 좋아요를 누른 적이 있음)
-                .map(like -> {
-                    // 삭제된 상태일 때만 복원하고 이벤트를 발행
-                    if (like.isDeleted()) {
-                        like.restore();
-                        likeRepository.save(like);
-                        eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, true));
+                .map(existLike -> {
+                    // 삭제된 상태면 복원
+                    if (existLike.isDeleted()) {
+                        existLike.restore();
                     }
-                    return like;
+                    return existLike;
                 })
-                // 값이 없는 경우 (처음으로 좋아요를 누름)
+                // 값이 없는 경우 생성 (처음으로 좋아요를 누름)
                 .orElseGet(() -> {
                     UserEntity userProxy = userRepository.getReferenceById(userId);
                     ProductEntity productProxy = productRepository.getReferenceById(productId);
-                    LikeEntity newLike = LikeEntity.create(userProxy, productProxy);
 
-                    likeRepository.save(newLike);
-                    eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, true));
-                    return newLike;
+                    return LikeEntity.create(userProxy, productProxy);
                 });
+
+        likeRepository.save(like);
+        eventPublisher.publishEvent(new LikeChangedEvent(productId, userId, true));
+
+        return like;
     }
 
     @Transactional
