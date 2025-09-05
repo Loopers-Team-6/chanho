@@ -15,9 +15,6 @@ import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,11 +32,6 @@ public class OrderFacade {
     private final CouponService couponService;
     private final PaymentService paymentService;
 
-    @Retryable(
-            retryFor = {ObjectOptimisticLockingFailureException.class},
-            maxAttempts = 3,
-            backoff = @Backoff(delay = 200)
-    )
     @Transactional
     public OrderInfo placeOrder(OrderCommand.Place command) {
         if (command == null) {
@@ -67,11 +59,19 @@ public class OrderFacade {
     }
 
     private List<OrderItemInfo> checkStocks(List<OrderCommand.OrderItemDetail> items) {
-        return items.stream()
-                .map(item -> {
-                    ProductEntity product = productService.findById(item.productId());
+        List<Long> productIds = items.stream()
+                .map(OrderCommand.OrderItemDetail::productId)
+                .toList();
+        List<ProductEntity> products = productService.findAllByIdWithPessimisticLock(productIds);
+
+        return products.stream()
+                .map(product -> {
+                    OrderCommand.OrderItemDetail item = items.stream()
+                            .filter(i -> i.productId().equals(product.getId()))
+                            .findFirst()
+                            .orElseThrow(() -> new IllegalArgumentException("주문 항목에 없는 상품입니다: " + product.getId()));
                     if (product.getStock() < item.quantity()) {
-                        throw new IllegalArgumentException("재고가 부족합니다.");
+                        throw new IllegalArgumentException("재고가 부족합니다: " + product.getName());
                     }
                     return new OrderItemInfo(
                             product.getId(),
