@@ -1,7 +1,8 @@
 package com.loopers.interfaces.event;
 
+import com.loopers.config.KafkaMessage;
 import com.loopers.config.KafkaTopic;
-import com.loopers.domain.like.LikeChangedEvent;
+import com.loopers.event.domain.like.LikeChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -18,6 +19,7 @@ public class LikeChangedEventListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleLikeChangedEventToKafka(LikeChangedEvent event) {
-        kafkaTemplate.send(KafkaTopic.Like.LIKE_CHANGED, "product:" + event.productId(), event);
+        KafkaMessage<LikeChangedEvent> msg = KafkaMessage.of(event);
+        kafkaTemplate.send(KafkaTopic.Like.LIKE_CHANGED, "product:" + event.productId(), msg);
     }
 }

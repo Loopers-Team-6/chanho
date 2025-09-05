@@ -1,4 +1,4 @@
-package com.loopers.domain.like;
+package com.loopers.event.domain.like;
 
 public record LikeChangedEvent(
         Long productId,

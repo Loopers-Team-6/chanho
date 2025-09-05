@@ -21,6 +21,7 @@ spring:
     import:
       - jpa.yml
       - redis.yml
+      - kafka.yml
       - logging.yml
       - monitoring.yml
   cloud:
@@ -84,6 +85,14 @@ spring:
   config:
     activate:
       on-profile: local, test
+  jpa:
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      data-locations: classpath:sql/data-local.sql
+
 pg:
   simulator:
     url: http://localhost:8082

@@ -6,6 +6,7 @@ import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserGender;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.event.domain.like.LikeChangedEvent;
 import com.loopers.infrastructure.like.FakeLikeRepository;
 import com.loopers.infrastructure.product.FakeProductRepository;
 import com.loopers.infrastructure.user.FakeUserRepository;

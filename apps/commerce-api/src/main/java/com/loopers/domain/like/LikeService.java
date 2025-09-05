@@ -4,6 +4,7 @@ import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
 import com.loopers.domain.user.UserEntity;
 import com.loopers.domain.user.UserRepository;
+import com.loopers.event.domain.like.LikeChangedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;

@@ -24,10 +24,10 @@ public class PaymentReconciliationScheduler {
         ZonedDateTime threshold = ZonedDateTime.now().minusMinutes(5);
         List<PaymentEntity> payments = paymentService.findPaymentsToRetry(threshold);
         if (payments.isEmpty()) {
-            log.info("결제 요청 재시도 건이 없습니다.");
             return;
         }
 
+        log.info("결제 요청 재시도 대상 {}건에 대해 재시도 시도", payments.size());
         payments.forEach(paymentService::processAndSyncStatus);
     }
 
@@ -37,10 +37,10 @@ public class PaymentReconciliationScheduler {
         ZonedDateTime threshold = ZonedDateTime.now().minusMinutes(5);
         List<PaymentEntity> payments = paymentService.findPendingPayments(threshold);
         if (payments.isEmpty()) {
-            log.info("대기 중인 결제 요청이 없습니다.");
             return;
         }
 
+        log.info("대기 중인 결제 요청 {}건에 대해 상태 동기화 시도", payments.size());
         payments.forEach(paymentService::processAndSyncStatus);
     }
 }
