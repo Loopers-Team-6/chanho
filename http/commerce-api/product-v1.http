@@ -1,0 +1,3 @@
+### 좋아요 등록
+POST {{commerce-api}}/api/v1/products/1/like
+X-USER-ID: 1
