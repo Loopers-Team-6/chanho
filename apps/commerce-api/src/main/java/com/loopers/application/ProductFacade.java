@@ -3,10 +3,12 @@ package com.loopers.application;
 import com.loopers.domain.like.LikeService;
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductService;
+import com.loopers.event.domain.product.ProductViewedEvent;
 import com.loopers.interfaces.api.PageResponse;
 import com.loopers.interfaces.api.product.ProductV1Dto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +22,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ProductFacade {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final ProductService productService;
     private final LikeService likeService;
 
@@ -30,27 +33,32 @@ public class ProductFacade {
         boolean isLiked = likeService.isLiked(userId, productId);
         long likesCount = likeService.getLikesCount(productId);
 
+        eventPublisher.publishEvent(new ProductViewedEvent(productId, userId));
+
         return ProductV1Dto.ProductInfo.of(product, likesCount, isLiked);
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(value = "products", key = "'user:' + #userId + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort", unless = "#result.isEmpty()")
+    @Cacheable(
+            value = "products",
+            key = "'user:' + #userId + ':page:' + #pageable.pageNumber + ':size:' + #pageable.pageSize + ':sort:' + #pageable.sort",
+            unless = "#result.isEmpty()"
+    )
     public PageResponse<ProductV1Dto.ProductInfo> getProducts(Pageable pageable, Long userId) {
         Page<ProductEntity> products = productService.findAll(pageable);
-        List<Long> productIds = products.getContent().stream()
+        List<Long> productIds = products.getContent()
+                .stream()
                 .map(ProductEntity::getId)
                 .toList();
 
         Set<Long> likedProductIds = likeService.findLikedProductIds(userId, productIds);
         Map<Long, Long> likesCounts = likeService.getLikesCounts(productIds);
 
-        return PageResponse.from(
-                products.map(product -> {
-                    boolean isLiked = likedProductIds.contains(product.getId());
-                    long likesCount = likesCounts.getOrDefault(product.getId(), 0L);
-                    return ProductV1Dto.ProductInfo.of(product, likesCount, isLiked);
-                })
-        );
+        return PageResponse.from(products.map(product -> {
+            boolean isLiked = likedProductIds.contains(product.getId());
+            long likesCount = likesCounts.getOrDefault(product.getId(), 0L);
+            return ProductV1Dto.ProductInfo.of(product, likesCount, isLiked);
+        }));
     }
 
     public void addLike(String userId, Long productId) {
