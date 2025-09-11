@@ -1,5 +1,6 @@
 package com.loopers.domain.order;
 
+import com.loopers.domain.order.event.OrderCompletedEvent;
 import com.loopers.domain.order.event.OrderFailedEvent;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.product.ProductService;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +26,7 @@ public class OrderService {
     }
 
     public OrderEntity findById(Long orderId) {
-        return orderRepository.findById(orderId)
-                .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
+        return orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
     }
 
     public void updateOrderStatus(Long orderId, PaymentStatus status) {
@@ -36,7 +38,19 @@ public class OrderService {
                 .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
 
         switch (status) {
-            case SUCCESS -> order.complete();
+            case SUCCESS -> {
+                order.complete();
+                List<OrderCompletedEvent.Item> items = order.getItems()
+                        .stream()
+                        .map(item -> new OrderCompletedEvent.Item(item.getProductId(), item.getPrice(), item.getQuantity()))
+                        .toList();
+                eventPublisher.publishEvent(new OrderCompletedEvent(
+                        orderId,
+                        order.getUser().getId(),
+                        order.getFinalPrice(),
+                        items
+                ));
+            }
             case FAILED -> {
                 order.fail();
                 if (order.isStockDeducted()) {
