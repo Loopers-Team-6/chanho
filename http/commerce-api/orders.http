@@ -1,0 +1,18 @@
+### 주문 요청
+POST {{commerce-api}}/api/v1/orders
+X-USER-ID: 1
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": 1,
+      "quantity": 2
+    }
+  ],
+  "paymentMethod": "POINT"
+}
+
+### 주문 정보 확인
+GET {{commerce-api}}/api/v1/orders/1
+X-USER-ID: 1

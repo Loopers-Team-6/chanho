@@ -1,3 +1,11 @@
 ### 좋아요 등록
 POST {{commerce-api}}/api/v1/products/1/like
 X-USER-ID: 1
+
+### 좋아요 취소
+DELETE {{commerce-api}}/api/v1/products/1/like
+X-USER-ID: 1
+
+### 상품 조회
+GET {{commerce-api}}/api/v1/products/1
+X-USER-ID: 1

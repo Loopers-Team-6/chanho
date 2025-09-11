@@ -1,0 +1,14 @@
+### 회원가입
+POST {{commerce-api}}/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "test@test.com",
+  "gender": "MALE",
+  "birth": "2000-01-01"
+}
+
+### 내 정보 조회
+GET {{commerce-api}}/api/v1/users/me
+X-USER-ID: 1
