@@ -4,5 +4,4 @@ public record LikeChangedEvent(
         Long productId,
         Long userId,
         boolean liked
-) {
-}
+) {}
