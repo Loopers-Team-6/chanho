@@ -2,8 +2,8 @@ package com.loopers.interfaces.event;
 
 import com.loopers.config.KafkaMessage;
 import com.loopers.config.KafkaTopic;
-import com.loopers.domain.order.event.OrderCompletedEvent;
 import com.loopers.event.domain.like.LikeChangedEvent;
+import com.loopers.event.domain.order.OrderCompletedEvent;
 import com.loopers.event.domain.product.ProductViewedEvent;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;

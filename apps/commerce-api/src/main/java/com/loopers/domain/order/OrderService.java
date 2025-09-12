@@ -1,9 +1,9 @@
 package com.loopers.domain.order;
 
-import com.loopers.domain.order.event.OrderCompletedEvent;
 import com.loopers.domain.order.event.OrderFailedEvent;
 import com.loopers.domain.payment.PaymentStatus;
 import com.loopers.domain.product.ProductService;
+import com.loopers.event.domain.order.OrderCompletedEvent;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,8 @@ public class OrderService {
     }
 
     public OrderEntity findById(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
+        return orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found: " + orderId));
     }
 
     public void updateOrderStatus(Long orderId, PaymentStatus status) {
@@ -46,7 +47,8 @@ public class OrderService {
                         .toList();
                 eventPublisher.publishEvent(new OrderCompletedEvent(
                         orderId,
-                        order.getUser().getId(),
+                        order.getUser()
+                                .getId(),
                         order.getFinalPrice(),
                         items
                 ));
