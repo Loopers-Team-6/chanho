@@ -46,4 +46,11 @@ public class FakeProductRepository extends InMemoryCrudRepository<ProductEntity>
                 .filter(product -> product.getId().equals(id))
                 .findFirst();
     }
+
+    @Override
+    public List<ProductEntity> findAllByIdWithPessimisticLock(List<Long> productIds) {
+        return map.values().stream()
+                .filter(product -> productIds.contains(product.getId()))
+                .toList();
+    }
 }

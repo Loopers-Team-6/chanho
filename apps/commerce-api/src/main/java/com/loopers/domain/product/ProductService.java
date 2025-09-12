@@ -98,4 +98,8 @@ public class ProductService {
         orderRepository.save(order);
         log.info("재고 복원 완료: orderId={}", orderId);
     }
+
+    public List<ProductEntity> findAllByIdWithPessimisticLock(List<Long> productIds) {
+        return productRepository.findAllByIdWithPessimisticLock(productIds);
+    }
 }

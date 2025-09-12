@@ -4,17 +4,22 @@ import com.loopers.domain.order.OrderEntity;
 import com.loopers.domain.order.OrderService;
 import com.loopers.domain.payment.PaymentEntity;
 import com.loopers.domain.payment.PaymentMethod;
+import com.loopers.domain.payment.PaymentProcessedEvent;
 import com.loopers.domain.payment.PointPaymentEntity;
 import com.loopers.domain.point.PointService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class PointPaymentProcessor implements PaymentProcessor {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final PointService pointService;
     private final OrderService orderService;
 
@@ -38,10 +43,12 @@ public class PointPaymentProcessor implements PaymentProcessor {
         try {
             pointService.deductPoints(userId, finalPrice);
             payment.markAsSuccess();
-        } catch (IllegalStateException e) {
+        } catch (RuntimeException e) {
+            log.error("포인트 결제 실패: ", e);
             payment.markAsFailed();
-            order.fail();
             orderService.save(order);
         }
+
+        eventPublisher.publishEvent(new PaymentProcessedEvent(payment.getOrderId(), payment.getStatus()));
     }
 }

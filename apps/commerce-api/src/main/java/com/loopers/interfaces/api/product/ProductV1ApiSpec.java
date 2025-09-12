@@ -16,4 +16,9 @@ public interface ProductV1ApiSpec {
     @Operation(summary = "상품 목록 조회")
     ApiResponse<PageResponse<ProductV1Dto.ProductInfo>> getProducts(Pageable pageable, HttpServletRequest request);
 
+    @Operation(summary = "상품 좋아요 추가")
+    ApiResponse<Object> addLike(Long productId, HttpServletRequest request);
+
+    @Operation(summary = "상품 좋아요 제거")
+    ApiResponse<Object> removeLike(Long productId, HttpServletRequest request);
 }

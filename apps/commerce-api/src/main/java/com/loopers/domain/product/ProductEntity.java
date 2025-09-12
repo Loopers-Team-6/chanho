@@ -39,9 +39,6 @@ public class ProductEntity extends BaseEntity {
     @Column(nullable = false, name = "like_count", columnDefinition = "bigint default 0")
     private long likeCount;
 
-    @Version
-    Long version;
-
     private ProductEntity(String productName, int price, int initialStock, BrandEntity brand) {
         if (productName == null || productName.isBlank() || price <= 0 || initialStock < 0 || brand == null) {
             throw new IllegalArgumentException("모든 필드는 유효해야 합니다.");
