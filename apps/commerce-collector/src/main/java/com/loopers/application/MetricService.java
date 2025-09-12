@@ -3,6 +3,7 @@ package com.loopers.application;
 import com.loopers.domain.metric.ProductMetricEntity;
 import com.loopers.domain.metric.ProductMetricRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class MetricService {
 
+    private final ApplicationEventPublisher eventPublisher;
     private final ProductMetricRepository productMetricRepository;
 
     @Transactional
@@ -20,6 +22,8 @@ public class MetricService {
         ProductMetricEntity metric = findOrCreateMetric(productId);
         metric.increaseViewCount();
         productMetricRepository.save(metric);
+
+        eventPublisher.publishEvent(new ProductMetricEvent(productId, ProductMetricEvent.MetricType.VIEW, 1));
     }
 
     @Transactional
@@ -31,6 +35,8 @@ public class MetricService {
             metric.decreaseLikeCount();
         }
         productMetricRepository.save(metric);
+
+        eventPublisher.publishEvent(new ProductMetricEvent(productId, ProductMetricEvent.MetricType.LIKE, isLiked));
     }
 
     @Transactional
@@ -38,6 +44,8 @@ public class MetricService {
         ProductMetricEntity metric = findOrCreateMetric(productId);
         metric.addOrder(quantity, price);
         productMetricRepository.save(metric);
+
+        eventPublisher.publishEvent(new ProductMetricEvent(productId, ProductMetricEvent.MetricType.ORDER, quantity));
     }
 
     private ProductMetricEntity findOrCreateMetric(Long productId) {

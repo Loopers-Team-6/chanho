@@ -9,3 +9,6 @@ X-USER-ID: 1
 ### 상품 조회
 GET {{commerce-api}}/api/v1/products/1
 X-USER-ID: 1
+
+### 상품 랭킹 조회
+GET {{commerce-api}}/api/v1/rankings
