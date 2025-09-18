@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -22,6 +23,7 @@ import java.time.LocalDate;
         }
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
 public class ProductMetricEntity extends BaseEntity {
 
     @Column(
