@@ -91,7 +91,7 @@ spring:
     init:
       mode: always
       encoding: UTF-8
-      data-locations: classpath:sql/data-local.sql
+  #      data-locations: classpath:sql/data-local.sql
 
 pg:
   simulator:

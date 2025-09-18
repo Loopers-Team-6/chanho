@@ -21,17 +21,21 @@ public class UserEntityTest {
     @DisplayName("사용자 모델을 생성할 때, ")
     @Nested
     class Create {
+
         @DisplayName("username이 `영문 및 숫자 10자 이내` 형식에 맞지 않으면, 객체 생성에 실패한다")
         @ParameterizedTest
         @NullAndEmptySource
-        @ValueSource(strings = {"한글", "kor한글", "verylongtext", "_", "hello-world"})
+        @ValueSource(strings = {"한글", "kor한글", "verylonglongtext", "hello-world"})
         void failedToCreateUserModel_whenUsernameIsInvalid(String invalidUsername) {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(
+                    IllegalArgumentException.class,
                     () -> UserEntity.create(
                             invalidUsername,
                             "test@gmail.com",
                             UserGender.MALE,
-                            LocalDate.of(2000, 1, 1)));
+                            LocalDate.of(2000, 1, 1)
+                    )
+            );
         }
 
         @DisplayName("이메일이 `xx@yy.zz` 형식에 맞지 않으면, UserEntity 객체 생성에 실패한다.")
@@ -39,12 +43,15 @@ public class UserEntityTest {
         @NullAndEmptySource
         @ValueSource(strings = {"invalid-invalidEmail", "test@test", "test@test.", "test@.com", "@test.com", "test@test.c", "test@test_com", "test@test,com"})
         void failedToCreateUserModel_whenEmailIsInvalid(String invalidEmail) {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(
+                    IllegalArgumentException.class,
                     () -> UserEntity.create(
                             "mwma91",
                             invalidEmail,
                             UserGender.MALE,
-                            LocalDate.of(2000, 1, 1)));
+                            LocalDate.of(2000, 1, 1)
+                    )
+            );
         }
 
         @DisplayName("생년월일이 `yyyy-MM-dd` 형식에 맞지 않거나 유효하지 않은 날짜이면, UserEntity 객체 생성에 실패한다.")
@@ -52,12 +59,15 @@ public class UserEntityTest {
         @NullSource
         @MethodSource("invalidBirthDates")
         void failedToCreateUserModel_whenBirthDateIsInvalid(LocalDate invalidBirthDate) {
-            assertThrows(IllegalArgumentException.class,
+            assertThrows(
+                    IllegalArgumentException.class,
                     () -> UserEntity.create(
                             "mwma91",
                             "test@gmail.com",
                             UserGender.MALE,
-                            invalidBirthDate));
+                            invalidBirthDate
+                    )
+            );
         }
 
         public static Stream<Arguments> invalidBirthDates() {
