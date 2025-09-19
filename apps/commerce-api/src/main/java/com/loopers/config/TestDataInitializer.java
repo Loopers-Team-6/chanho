@@ -2,6 +2,8 @@ package com.loopers.config;
 
 import com.loopers.domain.brand.BrandEntity;
 import com.loopers.domain.brand.BrandRepository;
+import com.loopers.domain.metric.ProductMetricEntity;
+import com.loopers.domain.metric.ProductMetricRepository;
 import com.loopers.domain.point.PointEntity;
 import com.loopers.domain.point.PointRepository;
 import com.loopers.domain.product.ProductEntity;
@@ -25,16 +27,19 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class TestDataInitializer {
 
+    private static final Random RANDOM = new Random();
+
     private final UserRepository userRepository;
     private final PointRepository pointRepository;
     private final BrandRepository brandRepository;
     private final ProductRepository productRepository;
-    private final Random random = new Random();
+    private final ProductMetricRepository productMetricRepository;
 
     @PostConstruct
     public void init() {
         initUser();
-        initCatalog();
+        List<ProductEntity> products = initCatalog();
+        initMetrics(products);
     }
 
     private void initUser() {
@@ -53,15 +58,15 @@ public class TestDataInitializer {
 
         for (UserEntity user : persisted) {
             PointEntity point = PointEntity.create(user);
-            point.charge(BigDecimal.valueOf((random.nextInt(100) + 1) * 1000)); // 1,000 ~ 100,000원 충전
+            point.charge(BigDecimal.valueOf((RANDOM.nextInt(100) + 1) * 1000)); // 1,000 ~ 100,000원 충전
             points.add(point);
         }
         pointRepository.saveAll(points);
     }
 
-    private void initCatalog() {
+    private List<ProductEntity> initCatalog() {
         if (productRepository.count() > 1) {
-            return;
+            return List.of();
         }
 
         List<BrandEntity> brands = new ArrayList<>();
@@ -75,11 +80,38 @@ public class TestDataInitializer {
         // 2. 상품 100개 생성
         List<ProductEntity> products = new ArrayList<>();
         for (int i = 1; i <= 100; i++) {
-            int price = (random.nextInt(100) + 1) * 1000; // 1,000 ~ 100,000원
-            int stock = random.nextInt(100);
-            BrandEntity randomBrand = persisted.get(random.nextInt(brands.size()));
+            int price = (RANDOM.nextInt(100) + 1) * 1000; // 1,000 ~ 100,000원
+            int stock = RANDOM.nextInt(100);
+            BrandEntity randomBrand = persisted.get(RANDOM.nextInt(brands.size()));
             products.add(ProductEntity.create("Product " + i, price, stock, randomBrand));
         }
-        productRepository.saveAll(products);
+        return productRepository.saveAll(products);
+    }
+
+    private void initMetrics(List<ProductEntity> products) {
+        if (productMetricRepository.count() > 1) {
+            return;
+        }
+
+        List<ProductMetricEntity> metrics = new ArrayList<>();
+        LocalDate today = LocalDate.now();
+
+        // 지난 60일간의 데이터 생성
+        for (int i = 0; i < 60; i++) {
+            LocalDate date = today.minusDays(i);
+            for (ProductEntity product : products) {
+                ProductMetricEntity metric = ProductMetricEntity.create(product.getId(), date);
+                // 랜덤 값으로 view, like, order count 설정 (실제 로직처럼)
+                for (int i1 = 0; i1 < RANDOM.nextInt(1000); i1++) {
+                    metric.increaseViewCount();
+                }
+                if (RANDOM.nextBoolean()) {
+                    metric.increaseLikeCount();
+                }
+                metric.addOrder(RANDOM.nextInt(5), product.getPrice());
+                metrics.add(metric);
+            }
+        }
+        productMetricRepository.saveAll(metrics);
     }
 }
