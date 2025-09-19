@@ -1,4 +1,4 @@
-package com.loopers.config.batch;
+package com.loopers.config.batch.weekly;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
