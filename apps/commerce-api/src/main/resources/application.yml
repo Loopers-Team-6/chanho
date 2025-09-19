@@ -92,7 +92,7 @@ spring:
       on-profile: local, test
   batch:
     job:
-      enabled: true
+      enabled: false
     jdbc:
       initialize-schema: always
   jpa:

@@ -14,6 +14,7 @@ import com.loopers.domain.user.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ import java.util.Random;
 
 @Component
 @Profile("local")
+@Order(1)
 @RequiredArgsConstructor
 public class TestDataInitializer {
 
