@@ -1,7 +1,10 @@
-package com.loopers.application.ranking;// com/loopers/application/ranking/RankingFacade.java
+package com.loopers.application.ranking;
 
 import com.loopers.domain.product.ProductEntity;
 import com.loopers.domain.product.ProductRepository;
+import com.loopers.domain.ranking.MonthlyProductRanking;
+import com.loopers.domain.ranking.RankingService;
+import com.loopers.domain.ranking.WeeklyProductRanking;
 import com.loopers.interfaces.api.PageResponse;
 import com.loopers.interfaces.api.ranking.RankingV1Dto;
 import lombok.RequiredArgsConstructor;
@@ -13,8 +16,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +32,8 @@ import java.util.stream.Collectors;
 public class RankingFacade {
 
     private final StringRedisTemplate redisTemplate;
-    private final ProductRepository productRepository; // 상품 정보 조회를 위함
+    private final ProductRepository productRepository;
+    private final RankingService rankingService;
 
     @Transactional(readOnly = true)
     public PageResponse<RankingV1Dto.ProductRankResponse> getDailyRanking(LocalDate date, Pageable pageable) {
@@ -70,5 +76,59 @@ public class RankingFacade {
                         ? total
                         : 0
         ));
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<RankingV1Dto.ProductRankResponse> getWeeklyRanking(LocalDate date, Pageable pageable) {
+        // 해당 주의 시작일(월요일) 계산
+        LocalDate weekStartDate = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+
+        Page<WeeklyProductRanking> weeklyRankings = rankingService.getWeeklyRanking(weekStartDate, pageable);
+
+        if (weeklyRankings.isEmpty()) {
+            return PageResponse.from(Page.empty(pageable));
+        }
+
+        List<Long> productIds = weeklyRankings.getContent().stream()
+                .map(WeeklyProductRanking::getProductId)
+                .toList();
+
+        Map<Long, ProductEntity> productMap = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, Function.identity()));
+
+        Page<RankingV1Dto.ProductRankResponse> responsePage = weeklyRankings.map(ranking -> {
+            ProductEntity product = productMap.get(ranking.getProductId());
+            long rank = pageable.getOffset() + weeklyRankings.getContent().indexOf(ranking) + 1;
+            return RankingV1Dto.ProductRankResponse.of(rank, ranking.getScore(), product);
+        });
+
+        return PageResponse.from(responsePage);
+    }
+
+    @Transactional(readOnly = true)
+    public PageResponse<RankingV1Dto.ProductRankResponse> getMonthlyRanking(LocalDate date, Pageable pageable) {
+        // 해당 월의 시작일 계산
+        LocalDate monthStartDate = date.with(TemporalAdjusters.firstDayOfMonth());
+
+        Page<MonthlyProductRanking> monthlyRankings = rankingService.getMonthlyRanking(monthStartDate, pageable);
+
+        if (monthlyRankings.isEmpty()) {
+            return PageResponse.from(Page.empty(pageable));
+        }
+
+        List<Long> productIds = monthlyRankings.getContent().stream()
+                .map(MonthlyProductRanking::getProductId)
+                .toList();
+
+        Map<Long, ProductEntity> productMap = productRepository.findAllById(productIds).stream()
+                .collect(Collectors.toMap(ProductEntity::getId, Function.identity()));
+
+        Page<RankingV1Dto.ProductRankResponse> responsePage = monthlyRankings.map(ranking -> {
+            ProductEntity product = productMap.get(ranking.getProductId());
+            long rank = pageable.getOffset() + monthlyRankings.getContent().indexOf(ranking) + 1;
+            return RankingV1Dto.ProductRankResponse.of(rank, ranking.getScore(), product);
+        });
+
+        return PageResponse.from(responsePage);
     }
 }

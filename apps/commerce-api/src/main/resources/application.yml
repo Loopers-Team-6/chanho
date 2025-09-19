@@ -34,6 +34,11 @@ spring:
           pg-client:
             connect-timeout: 1000
             read-timeout: 6000
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: never
 
 springdoc:
   use-fqn: true
@@ -85,13 +90,18 @@ spring:
   config:
     activate:
       on-profile: local, test
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
   jpa:
     defer-datasource-initialization: true
   sql:
     init:
       mode: always
       encoding: UTF-8
-      data-locations: classpath:sql/data-local.sql
+  #      data-locations: classpath:sql/data-local.sql
 
 pg:
   simulator:

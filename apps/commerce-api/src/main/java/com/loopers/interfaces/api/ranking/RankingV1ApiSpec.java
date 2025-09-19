@@ -14,7 +14,12 @@ import java.time.LocalDate;
 )
 public interface RankingV1ApiSpec {
 
-    @Operation(summary = "랭킹 조회")
+    @Operation(summary = "일간 랭킹 조회")
     ApiResponse<PageResponse<RankingV1Dto.ProductRankResponse>> getDailyRanking(LocalDate date, Pageable pageable);
 
+    @Operation(summary = "주간 랭킹 조회")
+    ApiResponse<PageResponse<RankingV1Dto.ProductRankResponse>> getWeeklyRanking(LocalDate date, Pageable pageable);
+
+    @Operation(summary = "월간 랭킹 조회")
+    ApiResponse<PageResponse<RankingV1Dto.ProductRankResponse>> getMonthlyRanking(LocalDate date, Pageable pageable);
 }

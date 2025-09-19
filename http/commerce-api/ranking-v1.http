@@ -1,0 +1,8 @@
+### 일간 상품 랭킹 조회
+GET {{commerce-api}}/api/v1/rankings?period=daily
+
+### 주간 상품 랭킹 조회
+GET {{commerce-api}}/api/v1/rankings?period=weekly&date=2025-09-12
+
+### 월간 상품 랭킹 조회
+GET {{commerce-api}}/api/v1/rankings?period=monthly&date=2025-09-19

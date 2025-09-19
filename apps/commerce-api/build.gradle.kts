@@ -25,4 +25,7 @@ dependencies {
     // test-fixtures
     testImplementation(testFixtures(project(":modules:jpa")))
     testImplementation(testFixtures(project(":modules:redis")))
+
+    // batch
+    implementation("org.springframework.boot:spring-boot-starter-batch")
 }

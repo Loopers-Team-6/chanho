@@ -18,8 +18,8 @@ public class MetricService {
     private final ProductMetricRepository productMetricRepository;
 
     @Transactional
-    public void updateViewCount(Long productId) {
-        ProductMetricEntity metric = findOrCreateMetric(productId);
+    public void updateViewCount(Long productId, LocalDate publishedDate) {
+        ProductMetricEntity metric = findOrCreateMetric(productId, publishedDate);
         metric.increaseViewCount();
         productMetricRepository.save(metric);
 
@@ -27,8 +27,8 @@ public class MetricService {
     }
 
     @Transactional
-    public void updateLikeCount(Long productId, boolean isLiked) {
-        ProductMetricEntity metric = findOrCreateMetric(productId);
+    public void updateLikeCount(Long productId, boolean isLiked, LocalDate publishedDate) {
+        ProductMetricEntity metric = findOrCreateMetric(productId, publishedDate);
         if (isLiked) {
             metric.increaseLikeCount();
         } else {
@@ -40,17 +40,16 @@ public class MetricService {
     }
 
     @Transactional
-    public void updateOrderMetrics(Long productId, int quantity, BigDecimal price) {
-        ProductMetricEntity metric = findOrCreateMetric(productId);
+    public void updateOrderMetrics(Long productId, int quantity, BigDecimal price, LocalDate publishedDate) {
+        ProductMetricEntity metric = findOrCreateMetric(productId, publishedDate);
         metric.addOrder(quantity, price);
         productMetricRepository.save(metric);
 
         eventPublisher.publishEvent(new ProductMetricEvent(productId, ProductMetricEvent.MetricType.ORDER, quantity));
     }
 
-    private ProductMetricEntity findOrCreateMetric(Long productId) {
-        LocalDate today = LocalDate.now();
-        return productMetricRepository.findByProductIdAndMetricDateWithLock(productId, today)
-                .orElse(ProductMetricEntity.create(productId, today));
+    private ProductMetricEntity findOrCreateMetric(Long productId, LocalDate publishedDate) {
+        return productMetricRepository.findByProductIdAndMetricDateWithLock(productId, publishedDate)
+                .orElse(ProductMetricEntity.create(productId, publishedDate));
     }
 }

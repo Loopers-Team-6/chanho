@@ -41,7 +41,12 @@ public class MetricsConsumer {
 
                 recordEvent(message, KafkaTopic.Catalog.LIKE_CHANGED);
                 LikeChangedEvent event = message.payload();
-                metricService.updateLikeCount(event.productId(), event.isLiked());
+                metricService.updateLikeCount(
+                        event.productId(),
+                        event.isLiked(),
+                        message.publishedAt()
+                                .toLocalDate()
+                );
             }
 
             acknowledgment.acknowledge();
@@ -67,7 +72,11 @@ public class MetricsConsumer {
 
                 recordEvent(message, KafkaTopic.Catalog.PRODUCT_VIEWED);
                 ProductViewedEvent event = message.payload();
-                metricService.updateViewCount(event.productId());
+                metricService.updateViewCount(
+                        event.productId(),
+                        message.publishedAt()
+                                .toLocalDate()
+                );
             }
 
             acknowledgment.acknowledge();
@@ -94,7 +103,13 @@ public class MetricsConsumer {
                 recordEvent(message, KafkaTopic.Catalog.PRODUCT_VIEWED);
                 OrderCompletedEvent event = message.payload();
                 for (OrderCompletedEvent.Item item : event.items()) {
-                    metricService.updateOrderMetrics(item.productId(), item.quantity(), item.price());
+                    metricService.updateOrderMetrics(
+                            item.productId(),
+                            item.quantity(),
+                            item.price(),
+                            message.publishedAt()
+                                    .toLocalDate()
+                    );
                 }
             }
 
